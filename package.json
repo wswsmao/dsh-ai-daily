@@ -1,0 +1,12 @@
+{
+  "name": "@local/dsh-ai-daily",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Deterministic bilingual AI technical daily: collect, read, review, archive, publish a mobile static site and deliver its link.",
+  "exports": {".": "./index.js", "./locale/*.json": "./locale/*.json", "./icon": "./icon.svg"},
+  "files": ["index.js", "lib", "tests", "locale", "icon.svg", "cordis.patch.yml", "README.md", "VALIDATION.md", ".gitignore", ".gitattributes"],
+  "scripts": {"test": "node --test tests/*.test.js"},
+  "dsh": {"bundle": {"patch": "./cordis.patch.yml"}}
+}

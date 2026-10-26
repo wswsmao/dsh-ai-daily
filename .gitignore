@@ -1,0 +1,7 @@
+.runtime/
+node_modules/
+*.log
+*.tmp
+coverage/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,5 @@
+- insert:
+    - id: ai-tech-daily
+      name: '@local/dsh-ai-daily'
+      config:
+        projectDir: 'D:\Program Files (x86)\dsh-deploy\archive\daily\ai-tech-daily'
