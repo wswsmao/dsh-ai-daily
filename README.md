@@ -20,7 +20,9 @@
 
 ## 运行
 
-固定日报每天12:30北京时间，回溯2天；补充词按3天轮换回溯7天。执行清单在config/queries.json，来源在config/sources.json。每次冻结配置及统一时间窗；中英文都执行，不设文章返回数上限。运行预算与模型调用预算触及会明确不完整，不能假称全量。
+固定日报每天12:10北京时间，回溯2天；补充词按3天轮换回溯7天。执行清单在config/queries.json，来源在config/sources.json。每次冻结配置及统一时间窗；中英文都执行，不设文章返回数上限。
+
+运行预算 `runtime_minutes` 是硬截止：超时后未完成阶段标 `partial` 且 `stop_reason=RUNTIME_BUDGET_EXCEEDED`，绝不假称完成。模型调用预算 `max_calls` 触及后停止调用并把相关文章标为处理失败，同样传导为 `partial`。
 
 工具`ai_daily_job setup`只读显示查询配置、发布配置和IM安全目标元数据，不读取Secret。首次配置需要已批准GitHub账号及IM目标，所有凭据不进Git。
 
@@ -34,6 +36,10 @@ collection → analysis → archive → site → publication → notification，
 - `cancelled/interrupted`：保留检查点，续跑同一时间窗。
 
 同一schedule_occurrence重放只返回同一run_id；同日修订采用版本链接不覆盖已分享版本。相同文章跨日按identity和内容指纹复用处理，修改内容可重新处理；事件聚合保留不同分析与原文链接。
+
+续跑语义：`resume` 不带 stage 时递增版本并重跑 archive/site/publication/notification（不重复检索）；`retry-publication` 复用已渲染目录重发，**不重新渲染**，靠 sha256 与版本标识校验文件未被改动，也不会覆盖已分享的版本链接——如需重渲染请用不带 stage 的 `resume`。`retry-notification` 仅在 publication 已 `verified` 完成后才允许，且先前投递结果未知时标 blocked 而不自动重发。
+
+事件聚合只接受可核验身份：模型给出的 `event_key` 必须对应文章自身的 arXiv 号、GitHub 仓库、release tag 或版本号才用于聚合，否则回落为单篇文章；组内成员缺少该身份时会拆散，避免公开页面出现错误归属。
 
 ## 安全边界
 
