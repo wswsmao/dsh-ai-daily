@@ -6,7 +6,7 @@ import {loadProject} from './lib/config.js';
 import {dateInShanghai} from './lib/io.js';
 import {createImAdapter,resolveDelivery} from './lib/im-delivery.js';
 
-export const inject=['tools','subprocess','llm','agentDefaultModel','wechatSearch','scheduleCenter'];
+export const inject=['tools','subprocess','llm','agentDefaultModel','wechatSearch','scheduleCenter','dshIm'];
 export function apply(ctx,config={}){
   const projectDir=path.resolve(config.projectDir??'D:\\Program Files (x86)\\dsh-deploy\\archive\\daily\\ai-tech-daily');
   const runProcess=createProcessRunner(ctx.subprocess);
