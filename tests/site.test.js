@@ -22,7 +22,7 @@ test('render responsive static site with complete catalog version URLs and local
   assert(html.includes('Content-Security-Policy'));
   assert(!html.includes('<img src=x')); assert(!html.includes('<script>alert')); assert(html.includes('&lt;script&gt;'));
   assert(!html.includes('onerror="')); assert(!html.includes('PRIVATE FULL'));
-  assert(html.includes('href="https://example.org/article?utm_source=test"')); assert(html.includes(result.marker));
+  assert(html.includes('href="https://example.org/article?utm_source=test"')); assert(html.includes('阅读原文')); assert(html.includes(result.marker));
   assert(!/<script[^>]+src="https?:/u.test(html));
   const js = await fs.readFile(path.join(dir, 'assets/site.js'), 'utf8'); assert(!js.includes('innerHTML')); assert(js.includes('textContent'));
   const css = await fs.readFile(path.join(dir, 'assets/site.css'), 'utf8'); assert(css.includes('@media(max-width:600px)')); assert(css.includes('focus-visible'));
