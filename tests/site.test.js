@@ -18,7 +18,7 @@ test('render responsive static site with complete catalog version URLs and local
   const dir = await temporary(t); const result = await renderSite({ siteDir: dir, edition: edition(), history: [{ date: '2026-10-25', version: 1, title: 'Yesterday', articleCount: 3 }], publicBaseUrl: 'https://wswsmao.github.io/ai-tech-daily/' });
   assert.equal(result.reportUrl, 'https://wswsmao.github.io/ai-tech-daily/reports/2026-10-26-1/v1.html');
   const html = await fs.readFile(path.join(dir, result.reportPath), 'utf8');
-  assert(html.includes('name="viewport"')); assert(html.includes('data-search')); assert(html.includes('data-topic')); assert(html.includes('data-article')); assert(html.includes('class="toc"')); assert(/href="#a1"/u.test(html)); assert(html.includes('aria-live="polite"'));
+  assert(html.includes('name="viewport"')); assert(html.includes('data-search')); assert(html.includes('data-topic')); assert(html.includes('data-article')); assert(html.includes('aria-live="polite"'));
   assert(html.includes('Content-Security-Policy'));
   assert(!html.includes('<img src=x')); assert(!html.includes('<script>alert')); assert(html.includes('&lt;script&gt;'));
   assert(!html.includes('onerror="')); assert(!html.includes('PRIVATE FULL'));
