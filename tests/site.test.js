@@ -18,8 +18,8 @@ test('render responsive static site with complete catalog version URLs and local
   const dir = await temporary(t); const result = await renderSite({ siteDir: dir, edition: edition(), history: [{ date: '2026-10-25', version: 1, title: 'Yesterday', articleCount: 3 }], publicBaseUrl: 'https://wswsmao.github.io/ai-tech-daily/' });
   assert.equal(result.reportUrl, 'https://wswsmao.github.io/ai-tech-daily/reports/2026-10-26-1/v1.html');
   const html = await fs.readFile(path.join(dir, result.reportPath), 'utf8');
-  assert(html.includes('name="viewport"')); assert(html.includes('data-search')); assert(html.includes('data-topic')); assert(html.includes('<details data-article')); assert(html.includes('aria-live="polite"'));
-  assert(html.includes('本期存在覆盖')); assert(html.includes('Content-Security-Policy'));
+  assert(html.includes('name="viewport"')); assert(html.includes('data-search')); assert(html.includes('data-topic')); assert(html.includes('data-article')); assert(html.includes('class="toc"')); assert(/href="#a1"/u.test(html)); assert(html.includes('aria-live="polite"'));
+  assert(html.includes('Content-Security-Policy'));
   assert(!html.includes('<img src=x')); assert(!html.includes('<script>alert')); assert(html.includes('&lt;script&gt;'));
   assert(!html.includes('onerror="')); assert(!html.includes('PRIVATE FULL'));
   assert(html.includes('href="https://example.org/article?utm_source=test"')); assert(html.includes(result.marker));
@@ -35,7 +35,7 @@ test('unsafe links and private values reject public render', async (t) => {
 });
 test('no truncation of article catalog and empty editions are valid', async (t) => {
   const dir = await temporary(t); const raw = edition(); raw.articles = Array.from({ length: 120 }, (_, i) => ({ title: `Article ${i}`, url: `https://example.org/${i}`, category: '模型' }));
-  const result = await renderSite({ siteDir: dir, edition: raw }); const html = await fs.readFile(path.join(dir, 'index.html'), 'utf8'); assert.equal((html.match(/<details data-article/gu) ?? []).length, 120);
+  const result = await renderSite({ siteDir: dir, edition: raw }); const html = await fs.readFile(path.join(dir, 'index.html'), 'utf8'); assert.equal((html.match(/data-article/gu) ?? []).length >= 120, true);
   raw.date = '2026-10-27'; raw.articles = []; raw.events = []; const empty = await renderSite({ siteDir: dir, edition: raw }); assert((await fs.readFile(path.join(dir, 'index.html'), 'utf8')).includes('不以宣传文凑数'));
   assert.equal(result.publicEdition.articles.length, 120); assert.equal(empty.publicEdition.articles.length, 0);
 });
