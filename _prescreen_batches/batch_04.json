@@ -1,0 +1,92 @@
+[
+ {
+  "i": 60,
+  "title": "上下文工程现状：长窗口为何失灵，AI Agent 如何在代码里管理记忆",
+  "account": "屠荒者",
+  "summary": "文章归纳上下文工程现状：长上下文窗口扩至百万乃至千万token仍不能自动避免遗忘与误判。早期失败包括上下文污染（错误事实进入后持续支配判断）、上下文分心（历史过长致模型模仿旧例忽略指令）、上下文混淆（无关信息改变任务假设）、上下文冲突（工具/技能/规则互相打架）；举例游戏智能体把旧版“冰茶”任务错套到新版。长窗口还会放大示例效应：实验先要求用俄语回答，再放入大量法语示例，随反例增多多种模型逐渐偏离明示规则；游戏智能体上下文超十万token后更易重复历史动作而非形成新计划。作者给出六类工具：上下文增强、装载策略、上下文检疫、裁剪、卸载、总结，并指出运行框架逐渐由确定性代码决定何时筛选/保留/清空。还提到对训练环境过拟合与上下文惯性（持续投入停滞子任务）两种新问题，以及定期写短记录、清空对话但保留工作环境以重新审视路线的实验。"
+ },
+ {
+  "i": 61,
+  "title": "告别提示词：上下文工程成 AI 落地真正护城河",
+  "account": "Agent 自动化实践",
+  "summary": "文章总结《The State of Context Engineering》等观点：AI控制范式从2023年Prompt Engineering，到2024-2025年Context Engineering（RAG检索、动态组装上下文），再到2026年Harness Engineering（用确定性代码做骨架，外部程序动态修剪、隔离与重置上下文）。文章列出智能体五种上下文腐化：Context Poisoning（幻觉/脏字段写入后被递归放大）、Distraction（无关文档稀释常识）、Confusion（多工具输出混杂）、Clash（新指令与初始Prompt冲突）、Inertia（历史包袱导致无法纠错）。工程共识是“确定性归代码、概率性归模型”，Harness需四道防线：动态修剪（清洗报错堆栈/冗余中间格式）、状态隔离（大结构化数据存库/缓存，上下文只传Reference ID）、显式状态机接管（流程/重试/分支由代码控制）、主动遗忘（子任务完成后提炼结论并丢弃冗余历史）。另给出独立开发者三条法则：设置上下文预算、状态留代码推理留模型、用schema/类型守卫/单元测试建立确定性反馈"
+ },
+ {
+  "i": 62,
+  "title": "上下文是稀缺资源：Anthropic的上下文工程指南",
+  "account": "和弦代码",
+  "summary": "文章解读Anthropic官方博客《Effective context engineering for AI agents》：上下文工程是优化采样时喂给LLM全部token的效用，是Prompt工程的超集，覆盖系统指令、工具、MCP、外部数据、消息历史与记忆。因Transformer注意力稀缺（n个token有n²对关系，且训练偏短序列），长上下文能力呈缓坡下降，故应将上下文当有限资源管理，目标是最小高信号token集合。四组件调校：系统提示取“恰当高度”并用XML分区、最小充分；工具取最小可用集且返回token经济；例子精选多样规范而非边角清单；检索转向“just in time”，Agent持轻量标识符按需拉数据（Claude Code用head/tail分析大数据集）。长程任务三策略：压缩（会话近上限时总结并保留架构决策/未解决bug，Claude Code带最近5个文件）、结构化笔记（窗口外NOTES.md，如Claude玩宝可梦跨千步追踪目标）、子代理架构（子代理花数万token探索，只回1000-2000 token摘要）。"
+ },
+ {
+  "i": 63,
+  "title": "深度拆解上下文工程的三大流派：graphify、headroom 与 dsh-context",
+  "account": "小火龙AI 手记",
+  "summary": "文章拆解上下文工程三大开源工具。graphify：面向Coding Agent，用Tree-sitter做本地AST语法分析，不消耗LLM Token，提取显式边（函数定义、类继承、Import、方法调用）与推导概念边，输出graph.json/graph.html/GRAPH_REPORT.md，按调用链精准提取目标函数上下游，相比整文件读取约减少80%代码上下文消耗。headroom：本地透明压缩代理/CLI，介于应用与模型接口之间，用SmartCrusher解析嵌套JSON/字典去冗余，压缩率60%-95%；CCR可逆检索把原始完整数据缓存在本地、按需取回；CacheAligner对Prompt前缀规则化对齐以提升KV Cache命中。dsh-context：长会话治理与观测，语义垃圾回收把被重新读取的旧输出替换为存根，合并相似grep结果、剥离日志只留错误/退出码/定位行号；清理内容写入追加日志，可通过context_gc_read重放；提供实时Web看板观察Token走势、系统提示与工具输出占比。三者构成输入层图谱化、传输层压缩、运行层GC、观测层看板的4层流水线。"
+ },
+ {
+  "i": 64,
+  "title": "Claude 工程博客精读：01 AI Agent 的有效上下文工程",
+  "account": "AICoder来财",
+  "summary": "本文精读Anthropic工程博客《Effective context engineering for AI agents》（2025-09-29）。Context engineering被定义为在“注意力预算”有限下，从不断变大的可能有用信息中估算并筛选高信号token放入上下文窗口的优化工程，范围宽于prompt engineering，涵盖tools、MCP、外部数据、对话历史等。上下文变长会因transformer中token两两关系约n^2增长、长序列训练经验较少，导致context rot：信息召回与长程推理精度缓坡下降而非突降。设计原则为informative yet tight：system prompt写在“黄金地带”，用XML/Markdown分块，保留角色边界与核心原则；工具集最小可用、返回省token、错误平滑；examples精选少量多样典型。检索从预检索转向just-in-time/progressive disclosure：保留文件路径、查询、链接等轻量标识，需要时再取，并与预检索混合。长任务维护三条路径：compaction（摘要并保留架构决策、未解b"
+ },
+ {
+  "i": 65,
+  "title": "拆解400万行代码， 这篇论文把 Harness 讲透了",
+  "account": "向量思维ZY",
+  "summary": "文章解读一篇拆解11个主流编程Agent产品、400万行代码的论文。Harness被定义为围绕模型、接入实际工作环境的运行系统：Agent = 模型 + Harness，模型提供理解推理，Harness组织调用、工具执行与结果反馈，实现行动—观察循环；与prompt、上下文管理区分，还负责权限、停止条件、异常处理。Harness归纳为七部分：循环控制、模型接入、工具系统、记忆与上下文管理、安全与权限、多智能体编排、扩展机制。以Mini-SWE-Agent说明循环；权限可精确到命令及参数（如允许git status，git push不匹配）并用OS沙箱限制；Aider用保留近期消息+摘要较早消息压缩。源码分析发现：主流系统运行时不依赖LangChain/LangGraph/AutoGen等通用框架，而用语言原生循环/异步（OpenCode用Vercel AI SDK处理模型与工具调用）；代码检索主要用文件路径、关键词、结构分析而非向量嵌入（但OpenClaw对话记忆检索用嵌入）；9个支持Skills、8个支持MCP，且多数先加载名称/描述、需要时再读完整内容。论文给出约90行Python"
+ },
+ {
+  "i": 66,
+  "title": "agent harness 技巧初探",
+  "account": "丁师兄大模型",
+  "summary": "作者为评估harness技巧对agent智能的贡献，用DeepSWE基准、开源模型deepseek-v4.1-flash、极简CLI mini-swe-agent（mini agent）与Codex做控制变量实验。选取三项Codex harness技术迁移到mini agent：工具输出截断、结构化编辑apply_patch、上下文压缩。基准mini agent已有10000字符工具截断和初始化workflow。工具截断：下调到1000字符，成功率降7.08%、input token增25.42%、steps增69.31%；上调到30000字符，成功率降7.96%、input token降11.64%、steps降4.30%；下调时截断任务113个/12223次，上调时37个/49次。引入apply_patch后成功率降15.04%，input token和steps几乎不变；用ChatGPT 5.6 luna测试，成功率降2.65%、input tokens增28.11%、steps增28.43%。上下文压缩阈值15万：成功率降7.08%、input token降15.78%、ste"
+ },
+ {
+  "i": 67,
+  "title": "DSH - DeepSeek Harness是什么",
+  "account": "愉乐闲闲",
+  "summary": "DSH全称DeepSeek Harness，是DeepSeek在8月13日开源的Agent运行框架/运行时，不是新模型。它把模型比作马，自身是缰绳和马鞍，负责拼装提示词、开放工具、记录会话、决定模型能访问的资源，包含对话循环、工具调用、内核沙箱、会话日志和本地浏览器界面。最大特点是“Everything is a Plugin”：模型适配器、工具注册表、会话日志甚至Agent循环本身都是插件，底层基于Cordis框架，插件可在运行时加载/替换/卸载，因此可接入DeepSeek、Anthropic或本地Ollama，会话保存在本地硬盘。使用方式：安装Node.js后运行`npx @deepseek-ai/dsh web`，默认在http://127.0.0.1:3080启动网页界面；也有macOS/Windows桌面版（暂无Linux）。两个提醒：PyPI上存在同名无关Python包deepseek-harness，官方包是npm的@deepseek-ai/dsh；当前为开发者预览版，后续有破坏性变更。截至10月4日一周npm下载量451,964次；DeepSeek公布Agent测评时会"
+ },
+ {
+  "i": 68,
+  "title": "企业如何做出高性价比的模型采购决策？关键在多模型编排与 Agent Harness",
+  "account": "特赞Tezign",
+  "summary": "文章（Tezign/特赞）提出企业AI采购决策应关注多模型编排与Agent Harness两类核心能力（Tezign Model Hub平台能力）。传统解法（固定工作流、模型路由网关、人工编排）存在天花板：写死流程难适应变化、网关只按请求分发且静态、人工编排不可复制。多模型编排被定义为把业务目标翻译成模型调用策略的中间层，需理解任务的多层约束（品牌调性、平台规则、目标人群、法务边界、成本预算），按任务/预算动态选择切换模型，并对结果质量负责（不达标回退）。Agent Harness被描述为给模型调用套上企业级运行边界：权限治理（每次调用校验可访问模型/数据/工具）、成本治理（预算与单价分配）、质量与合规治理（事前约束、事中监控、事后追溯）、结果回流（有效结构沉淀进Context System）。两者组合成“模型使用底盘”。文章指出简单、小量、高容错场景加这两层是过度设计，治理不成熟企业硬上Harness会成为瓶颈；趋势是从单模型选型转向模型组织与能力积累。末尾附特赞趋势信号与案例链接。"
+ },
+ {
+  "i": 69,
+  "title": "GrokBot 工程师：Agent Harness 真的已死？",
+  "account": "胡言Ray语",
+  "summary": "演讲者Jediah Katz（前Cursor harness工程师，现SpaceXAI/GrokBot）回顾头衔演变：2023 prompt engineer → 2025 context engineer → 2026 agent harness/harness engineering。Harness分两层：运行时（主循环位置、状态存储、可恢复性，类似传统软件工程）与上下文/编排（调用哪个模型、给什么上下文、提示词/工具/记忆压缩，多为未开垦领域）。2026年初Cursor用代号Grind Swarm的多模态长运行harness从零做浏览器，但随后出现“harness已死”说法：Anthropic删减Claude Code系统提示、YC认为只剩skills、作者团队也删掉补模型短板的护栏（如专用小模型修改代码、硬编码探索指令）。两项研究支持：UC Berkeley用7个前沿模型在Pi/Codex/Claude Code等harness上跑SWE-bench Lite，选择harness对新模型分数无实质影响；Apple/EPEL的MLE harness在MLE-bench上差别不大。"
+ },
+ {
+  "i": 70,
+  "title": "一台会自己组装的 AI Agent 机器：DeepSeek Harness 深剖",
+  "account": "紫晶探索者",
+  "summary": "DSH是DeepSeek开源的Agent Harness，源码级深剖显示它由约340个npm包、37.9万行TypeScript组成，采用Cordis插件框架：插件通过Context容器、Service插槽、类型化Event（emit/waterfall/parallel/serial/bail五种分发）、可逆Effect和按inject依赖唤醒的Loader组装；启动时从空根叠加dsh-base、dsh-web-app、profile/global/--patch等层生成插件树，加载顺序由依赖决定。运行时分浏览器客户端、宿主服务端插件树和外部世界三层；通信含一元RPC、WebSocket逻辑流（断线500ms→10s退避重连）和$events广播（离线不重放，重连基线+增量）。一次任务由turn/step驱动：step为一次模型请求及引发的工具执行，模型无工具调用则结束；工具调用须过权限检查→沙盒→执行并写入只追加的JSONL+zstd会话日志。核心不变量是Model-visible ⟺ logged，即模型看到的每个字都能从日志重建；日志为v4格式，含62类事件，压缩是“遮住”旧区"
+ },
+ {
+  "i": 71,
+  "title": "深入拆解Agent的工作机制和构成：Loop、Tools、Memory、Harness",
+  "account": "人人都是程序猿",
+  "summary": "本文是Agent工作机制科普：定义AI Agent为能调用工具的循环系统，核心是ReAct式Loop（Reason思考-Act行动-Observe观察-再Reason），模型输出工具调用指令而非最终文本，工具执行结果回灌上下文，直至任务完成。文章拆出四大组件：Loop机制、Tools（带名称/description的具体能力，建议一工具一简单任务，可经MCP接入外部工具）、Memory（早期向量库，现主流为可增删改的Markdown知识库文件夹，负责跨轮上下文管理）、Harness（调度管控：发起循环、执行工具、上下文溢出、异常处理、权限审批与用户问询，被类比为Agent操作系统）。文末给出Agent=LLM+Harness总结。结尾附多条图书商品广告，与正文技术内容无关。"
+ },
+ {
+  "i": 72,
+  "title": "字节 HarnessDev：当 Agent 开始成为自己的 Harness Engineer",
+  "account": "关于NLP那些你不知道的事",
+  "summary": "字节 Seed 等机构论文《HarnessDev: Can LLMs Create and Evolve Their Own Agent Harness?》提出让 LLM 成为自己的 Harness Engineer：将 Harness 拆为 Execution、Tools、Context、State、Lifecycle、Verification 六部分，仅给模型命令行/文件/Shell 等 Seed 能力，让其实现可运行 Harness。覆盖 SWE-bench Pro、Terminal-Bench、MLE-bench、EQ-Bench3、BrowseComp 等共 2207 样本。Opus 4.8 自生成 Harness 在 Writing 与部分 ML 实验可达/超人工参考，但 Coding/Terminal/Search 仍落后。关键发现：Harness 与 Model 强耦合，Opus 自构建 SWE-Pro Harness 在自身 Runtime 得 69.3，换 Gemini 3.1 Pro 后降至 33.0；某搜索任务重复搜索率由 10.1% 升至 88.2%。18 个"
+ },
+ {
+  "i": 73,
+  "title": "自由切换 agent harness：深入理解 UHP 协议与 HarnessRouter",
+  "account": "墨筝",
+  "summary": "文章解析 UHP（Unified Harness Protocol）协议与开源网关 HarnessRouter，用于统一业务系统与 Codex、Claude Code、OpenHands 等多套 Agent Harness 的接入。UHP 将任务分发、流式状态、多轮会话、文件产物等抽象为统一 HTTP 契约，定义 Harness、Response、Session、File 与 Container、Environment 与 Memory、Streaming/Cancellation/Error 六类对象；采用日期版本号（当前规范 2026-10-19），设 Core/Extended/Full 一致性等级，并通过 POST /v1/responses、SSE、previous_response_id 隐式恢复会话，区分 in_progress/completed/incomplete/cancelled/failed。HarnessRouter 社区版为单容器 Console/Gateway/Runner 三层：Console 提供 Web 与反向代理，Gateway 处理路由/鉴权/"
+ },
+ {
+  "i": 74,
+  "title": "读懂企业 Agent Harness：Slack 入口、身份代行与五块底座",
+  "account": "AI智能进阶实验室",
+  "summary": "基于 LangChain 2026-10-24 博文（Harrison Chase × Caspar Broekhuizen），文章总结其 GTM、OpenSWE、Content Studio 三套内部 Agent 共用的 company harness 五块底座：入口→身份→记忆→沙箱→定时。入口选 Slack，每个 Agent 独立 Slack App，支持 DM 与频道 @，并用 breakout 拆独立线程避免污染人类讨论，积压审批另做自定义 UI。身份按 Agent/工具拆分 OBO 与固定凭证：如 OpenSWE 对话开 PR 用调用者 GitHub handle（OBO），后台全库 review 用 GitHub App 固定身份；GTM 邮件 OBO 仅 DM 可用，公司 Twitter 发帖用固定凭证+白名单。记忆分全局层与用户层，由 Agent 决定写入；这是自评最薄弱一环。代码执行为“沙箱外编排、沙箱内运行”，OpenSWE 可按频道/用户选镜像，外连经 LangSmith Sandboxes secret proxy 避免明文密钥入沙箱。ambient 定时/事"
+ }
+]

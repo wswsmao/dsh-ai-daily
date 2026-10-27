@@ -24,7 +24,7 @@ async function fixture(t, options = {}) {
     if (args[0] === 'push' && options.pushFailure) return { exitCode: 1, stderr: 'SECRET TOKEN network failure' };
     return { exitCode: 0, stdout: '' };
   };
-  const fetch = async (url) => { verifications++; assert(url.startsWith('https://wswsmao.github.io/ai-tech-daily/reports/2026-10-26/v2.html?edition=')); return { ok: !options.notFound, text: async () => options.outdated ? '<meta name="daily-edition" content="old">' : `<meta name="daily-edition" content="${render.marker}">` }; };
+  const fetch = async (url) => { verifications++; assert(url.startsWith('https://wswsmao.github.io/ai-tech-daily/reports/2026-10-26-2/v2.html?edition=')); return { ok: !options.notFound, text: async () => options.outdated ? '<meta name="daily-edition" content="old">' : `<meta name="daily-edition" content="${render.marker}">` }; };
   const publisher = new PublishGithub({ siteDir: dir, runProcess, fetch, verifyAttempts: 3, verifyDelayMs: 0, delay: async () => {} });
   return { dir, render, publisher, calls, verifications: () => verifications };
 }

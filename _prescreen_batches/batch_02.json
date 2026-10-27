@@ -1,0 +1,92 @@
+[
+ {
+  "i": 30,
+  "title": "企业智能体基础设施关键技术研究",
+  "account": "AI科普馆",
+  "summary": "解读《企业智能体基础设施关键技术研究》报告：企业Agent将达数百至数千规模，基础设施分四层——Control Plane（注册中心、身份管理、策略管理，类比K8s控制面）、Runtime（启停调度Harness、资源池化）、Harness（Prompt/Context、Memory、Planning、反馈循环、错误处理九组件构成任务闭环）、Sandbox（容器/虚拟机/微VM/TEE隔离与审计）。提出治理先行的花名册/工牌/岗位说明，以及Token工程降本；落地挑战归纳为五个转向：管理Agent群、Agent系统性能、异构Agent操作系统、动态执行、运行时安全。"
+ },
+ {
+  "i": 31,
+  "title": "五款AI智能体框架参加同一项记忆测试，结果大相径庭",
+  "account": "云云众生s",
+  "summary": "Letta发布FrontierMemory基准（1.0，仅15个任务、每任务一次尝试），测试Agent从过去工作记录生成记忆并改善后续任务的能力，而非仅回忆事实。框架得分：Letta Dream 73.3%、Prime Agent 60%、OpenAI Agents SDK 40%、Claude Managed Agents 33.3%、Hermes 26.7%。模型生成记忆得分：Claude Opus 5.5与GLM-5.3 73.3%并列，Kimi K3 66.7%，GPT-6.1 Sol与Gemini 4 Argon 60%。成本上GPT-6.1 Sol约$0.77/任务，远低于Opus 5.5的$2.80与GLM-5.3的$3.58。案例显示Opus生成可迁移技能，GPT生成四个未用技能；基准局限为样本小、单次尝试，分数波动约6.7个百分点，且暂不覆盖在线记忆更新。"
+ },
+ {
+  "i": 32,
+  "title": "11 万 Star 的 AI 量化框架，开源了",
+  "account": "AI Agent投研",
+  "summary": "原文介绍开源多智能体LLM金融交易研究框架TradingAgents（归为Tauric Research，论文arXiv编号2412.20138，代码Apache-2.0，基于LangGraph）。事实机制：将一次交易决策拆为五段流水线——四类分析师（基本面/情绪/新闻/技术）并行出报告；多空研究员结构化辩论；交易员形成买卖方向、时机和仓位提案；风控团队评估波动率、流动性等；组合经理批准或否决，通过后进入模拟交易所执行。系统带记忆日志，持有期结束结算收益并生成反思供下一轮使用；角色、模型、辩论轮数可配置，可传入自有持仓组合。报道称GitHub数据（2026年10月抓取）为11.4万Star、2.2万Fork、493次提交，2026年10月发布v0.7.0，新增支持用自有ChatGPT Plus/Pro运行；支持多厂商模型及Ollama/OpenAI兼容端点。论文实验结果被描述为相比基线在累计收益、夏普比率、最大回撤方面明显改善，但属“论文口径下的相对提升”。作者观点：它不是自动实盘交易软件或稳赚策略，开源的是框架与流程而非收益；LLM采样非确定，同标的同日两次结果可能不同；本地部署仍需"
+ },
+ {
+  "i": 33,
+  "title": "智能体（Agentic AI）架构与多智能体协议标准化研究",
+  "account": "泷码软件",
+  "summary": "报告核心判断：多智能体协议标准化已越过实验窗口进入生产基础设施阶段，MCP为垂直接入、A2A为水平协作、AAIF提供中立治理。事实梳理：单体智能体由感知、记忆、决策、执行、交互构成能力闭环；四类多智能体协同模式为Orchestrator–Worker、Supervisor–Worker、层次化/嵌套编排、网状/对等协作。MCP由Anthropic于2024-11-25开源，采用宿主—客户端—服务器模型，暴露资源/工具/提示词三类原语；发布一年活跃公共服务器破万，Python/TypeScript SDK月下载超9700万次；2025-09上线MCP Registry，2025-11发布第四版规范，引入异步、无状态化、OAuth 2.1、Agentic Sampling等。A2A由Google开发并于2025-06捐赠Linux基金会，基于Agent Card实现不透明互操作；2026-04支持组织增至150余家，v1.0稳定规范引入多协议、企业级多租户与Signed Agent Cards，核心仓库星标超2.2万，SDK覆盖五种语言。AAIF于2025-12-09成立，由Anthrop"
+ },
+ {
+  "i": 34,
+  "title": "重磅！谷歌开源双层RSI框架Harness²，Gemini 3.5性能原地暴涨",
+  "account": "新智元",
+  "summary": "报道称谷歌等开源Harness²框架（GitHub: google-research/harness2，arXiv: 2610.14224，项目主页harness2.github.io）。事实机制：不改模型权重，而优化包围LLM的Harness八大可编辑组件——系统提示词、护栏、记忆、工具指导、子智能体、技能、脚本、插件；支持OpenCode与Codex执行器运行并验证复杂代码。双层递归：任务级采用PPC（提议-探测-组合），分析执行轨迹提出多个修改方案，试跑对比执行差并合成最优修改；元级在任务成功后提取核心逻辑与经验，附成功执行轨迹存入“错题本”以指导未来新任务的Harness编辑；递归分并行与顺序两种形式。评测称在全部锁定模型权重、完全不依赖真实标签验证的情况下，单步优化使GLM-5和Gemini 3.5 Flash提升：WorkBuddy-Bench最高+11.5分，JobBench +4.5分，LAB准确率+11.8个百分点；增加递归预算k可继续攀升。西北大学Ruiyao Xu实习参与；LangChain成员Sydney Runkle评论认为与Trace/Eval理念一致。作者"
+ },
+ {
+  "i": 35,
+  "title": "智能体安全评估平台实现研究报告：分类型评估框架 · 平台架构 · 落地路径 · 前瞻演进",
+  "account": "AI安全推进计划",
+  "summary": "报告提出智能体安全评估平台ASEP（Agent Security Evaluation Platform）。事实与方案：核心矛盾是评估对象异质、失效跨层、结论难互认；现有三大缺陷为类型失配（同一越狱题库测所有智能体）、层次失配（只测输出不测行动链）、闭环缺失。设计原则为“分类型×全链路×可闭环”，含类型驱动、行为优先、边界外置、可复现、证据内生、安全-效用平衡。分类矩阵采用“自主性×环境耦合度”，将智能体分为编排式、工具型、自主型、多智能体、具身型五类；九阶段流水线覆盖分类画像、风险定级、用例生成、环境构建、对抗执行、混合裁决、量化评分、定级报告、闭环回灌；九个维度（A–I）覆盖目标与指令完整性、权限与身份边界、工具与供应链、记忆与上下文、执行与隔离、协作与信任链、行为与对齐、可观测与可审计、功能安全。度量指标包括ASR、SUR（安全-效用权衡比）、GDI（目标漂移指数），并提出双裁判+人工仲裁。威胁框架引用OWASP ASI01–10、CSA、MITRE ATLAS（139项Agentic AI技法，新增缓解措施AML.M0037/M0038要求控制外置于智能体）。中国标准包括强制性"
+ },
+ {
+  "i": 36,
+  "title": "Microsoft Agent Framework + .NET 实战：从零构建多智能体应用，做自动化业务处理项目",
+  "account": "零基础WPF开发上位机",
+  "summary": "文章介绍微软官方企业级多智能体开发与编排框架Microsoft Agent Framework（MAF）。事实：MAF原生面向.NET，与Semantic Kernel定位互补——SK增强单智能体的插件/记忆/规划，MAF负责多智能体拓扑编排、工作流管控与生产治理。优势包括.NET类型安全、内置状态持久化/可观测性/权限治理、多模型兼容（Azure Foundry、OpenAI、Anthropic、本地Ollama），微软BUILD 2026发布。实战部分构建电商订单自动化多智能体系统：定义业务工具函数，创建订单接收、风控、库存、履约四个专业化Agent，用WorkflowBuilder构建流水线并支持异常分支终止，运行后订单依次经校验、风控评估、库存锁定与履约通知。生产优化四点：Durable Workflows将状态持久化到SQL Server/PostgreSQL并支持断点续跑（基于DurableTaskScheduler）；Agent Governance Toolkit提供运行时策略、敏感操作沙箱与全链路审计；内置OpenTelemetry对接Prometheus/Grafa"
+ },
+ {
+  "i": 37,
+  "title": "有人把 34 个开源 AI agent 框架扒了一遍：这张表，搞 agent 的人值得存",
+  "account": "未来碎片收集站",
+  "summary": "文章转述Octomind对34个开源AI Agent框架的盘点。事实分类：写agent逻辑的主流派包括LangChain（MIT，147k星）、LangGraph（MIT，42k星，适合有状态长流程）、CrewAI（角色化团队）、AutoGen（MIT代码但已进维护模式，官方建议转Microsoft Agent Framework）；模型无关工具箱派包括OpenAI Agents SDK（provider无关，称可接100+模型）、Pydantic AI（强类型，换模型改字符串）、Google ADK（Apache-2.0）、smolagents（核心循环约一千行，最后发布2026-05）；特定语言/生态派包括Agno、Mastra（TypeScript）、MAF（.NET/Python）。许可证风险：六个“能自托管”平台中仅Langflow和Sim每行都OSI认证开源；n8n明确说自己不是开源；部分框架核心MIT但ee/企业版目录单独授权；控制面（如LangSmith、CrewAI AMP）常闭源收费。选型结论：显式流程图+长流程状态选LangGraph；强类型/换模型方便选Pyda"
+ },
+ {
+  "i": 38,
+  "title": "从零到生产：一份系统的 AI 智能体开发指南",
+  "account": "架构与运维",
+  "summary": "指南定义智能体是以LLM为决策核心，在记忆、工具、环境间循环以自主完成目标任务的系统，而非单轮提示词问答。生产级智能体最小五层骨架：模型核心、记忆层、工具层/MCP、编排层、边界层/校验。记忆分工作上下文、会话摘要、外部记忆（向量库/RAG），原则是分层管理而非全量塞入上下文。工具与MCP：MCP是模型连接外部世界的标准协议，定义工具、资源、提示三类原语；到2026年由Linux基金会旗下AAIF托管，生态有数千服务器，被OpenAI Agents SDK、LangGraph、Claude Code、Cursor、Windsurf等原生支持；2026年7月新规范改为无状态设计，一次握手建立连接，远程MCP成为默认形态。编排分图式（如LangGraph，确定性强、支持Checkpoint/HITL/Tracing，适合固定合规流程）与对话式多Agent（如AutoGen/CrewAI，灵活但难调试）；生产必需状态持久化、人工介入与执行追踪。误区包括agent不等于更强提示词、工具越多越强、全自动才是真agent、上下文越长越好、只测单轮；判断变量为任务适合度、可靠性成本、可控与成本、可观"
+ },
+ {
+  "i": 39,
+  "title": "从单 Agent 到企业级多智能体：一文讲透 Multi-Agent 架构设计与工程治理",
+  "account": "智能体AI",
+  "summary": "文章从企业销售分析案例出发讲Multi-Agent架构设计与工程治理。单Agent复杂任务会失控，值得上多Agent的情形：任务可拆为相对独立部分、需要不同专业能力、可并行、需要独立复核。最小组成：Agent（专业化不只是改System Prompt，还需输入输出协议、工具权限、受控上下文与清晰边界）、Orchestrator（流程固定时可用普通代码编排）、Tool（查询与修改工具应分开授权）、Message（明确谁发送、属于哪任务、状态与失败恢复）、State（关键状态应持久化到明确数据结构或存储，而非只靠聊天记录）。五种架构：Supervisor（动态决定下一步，需限制允许Agent、最大调度轮次、时间成本、检查新信息与停止条件）；Orchestrator+Subagents（子任务尽量独立，子Agent返回结构化核心结论而非原始日志，例如JSON含region、sales_change_rate、main_findings、evidence、unresolved_questions）；Pipeline（固定工序，阶段协议与异常恢复，很多阶段可用普通代码）；Debate（分析/反方"
+ },
+ {
+  "i": 40,
+  "title": "企业智能体建设全景指南①｜总体架构篇：从单体智能到分层协同的骨架设计",
+  "account": "南晓木的楠",
+  "summary": "本文是企业智能体建设系列第①篇，给出企业智能体的定义：以LLM为大脑，能理解目标、拆解任务、调用工具并据反馈调整，形成观察-思考-行动-反思循环。作者提出四层总体架构：自下而上执行层、决策层、认知层、交互层，两侧由数据知识与治理安全两轨道贯穿；并给出L1规则自动化到L4自主运营的成熟度四级，以及单体智能体与多智能体系统的场景/复杂度权衡（建议从单体起步）。还梳理与企业现有系统的集成方向（入口身份、业务系统、数据知识、外联生态，建议平台化+连接器）和公有云/混合云/全私有化三种部署形态。全文为架构与方法论梳理，无具体实现、实验或量化评估；结论属作者观点，配套图示未在正文展开。"
+ },
+ {
+  "i": 41,
+  "title": "企业智能体建设全景指南③｜落地实践篇：多智能体协同、评测与治理体系全览",
+  "account": "南晓木的楠",
+  "summary": "系列第③篇聚焦落地实践：多智能体协同给出主管—工人、流水线、对等网络三种拓扑及通信四件套（消息格式、路由、可靠性、状态同步）；评测体系提出评测集构建、离线评测、在线评测、归因迭代四环闭环，列出任务完成率、事实准确性、工具调用成功率、响应延迟、用户满意度、安全拦截率六项指标并建议设红线；安全治理覆盖身份访问、数据安全、内容安全、运行安全、审计合规五维，以及策略预防、过程监控、事后审计三道防线；实施路线图分场景筛选、POC、试点、规模化推广、持续运营五阶段，每阶段设退出准则；可观测性分采集、处理、应用三层，强调按会话ID回放。文章为工程框架与清单式建议，无代码实现、实验数据或独立验证，指标阈值需业务确认。"
+ },
+ {
+  "i": 42,
+  "title": "一篇多模态Agentic框架最新前沿综述",
+  "account": "Ai尚研修",
+  "summary": "本文转述一篇60页多模态Agentic框架综述（arXiv:2608.20379），以模态为中心梳理感知—编排器—行动的仿生闭环。感知融合划分为三代：委托式（文本LLM调用CLIP/SAM/Whisper等工具）、晚期融合（冻结编码器+投影层，如LLaVA/Flamingo）、早期融合（GPT-4o/Gemini原生多模态共享注意力）。文章称多模态框架普遍优于以语言为中间表示的框架；记忆从分库文本索引走向统一嵌入跨模态检索，并用VideoAgent稀疏检索将每查询帧数压到8.4帧、处理量降低20倍来应对上下文爆炸。评估方面称LLM-as-a-Judge仅占约5%且限于GUI/Web，机器人与视频理解多用任务成功率；GUI/Web导航与人类仍有60–70%差距（WebArena等）。应用涵盖具身/VLA、GUI、多媒体生成、长视频理解。原文为二次综述摘要，未阅读全文；页面穿插大量培训课程广告，所述数据与结论需以原论文核对。"
+ },
+ {
+  "i": 43,
+  "title": "用 TypeScript 从零搭建 AI Agent 测试框架的实践指南",
+  "account": "第九便利",
+  "summary": "教程用TypeScript从零实现不绑定厂商的Agent harness（配套仓库agent-harness-from-scratch，按Git标签分阶段）。核心原则是模型只提出动作、harness负责执行：先建基础循环，用假模型避免真实API测试；随后加入带JSON Schema子集校验的工具注册表，区分工具失败与model_error；用Workspace限制文件读写在工作区内，命令工具只暴露预置命令名而非自由shell；通过maxSteps、maxToolCalls、timeoutMs与AbortSignal做执行预算与协作式取消；用maxToolResultChars/maxContextChars限制工具结果与上下文，并保证工具调用与其结果不被拆开；通过onEvent发射model_start/end、tool_start/end等事件做可观测性，并累加提供商上报的token用量。文章含大量实现细节与测试思路，明确说明是协作式取消、字符而非token限制、非OS级沙箱等局限；无性能基准或实验评估。"
+ },
+ {
+  "i": 44,
+  "title": "开源项目推荐：HarnessRouter，让 Grok Bot 接入多种 AI Agent 开发框架！",
+  "account": "艾算立方AIX3",
+  "summary": "文章介绍开源项目HarnessRouter，目标是让Grok Bot作为统一协调者把任务路由到不同Agent Harness执行，而非创建多个Bot。所支持的框架包括Codex、Claude Code、Hermes、DeepSeek Harness、Pi等，扩展方向提及System 1 Harness；具体兼容以项目文档为准。工作流示意为：用户提出需求→Grok Bot拆解并分配→DeepSeek Harness做数据分析→Codex做开发→Grok Bot通过浏览器检查产物。核心技术是UHP（Unified Harness Protocol），试图用统一接口处理Sessions、Streaming、Files、Cancellation、Failures等常见操作，降低多Harness集成成本并实现按环节匹配执行环境。文章为项目概述，无代码、实验或基准；实际权限隔离、运行成本、失败恢复与兼容性仍取决于各Harness适配。"
+ }
+]

@@ -1,0 +1,92 @@
+[
+ {
+  "i": 240,
+  "title": "Agent 老忘事？30 个 Notebook 把记忆技术跑通",
+  "account": "老朱言记",
+  "summary": "本文介绍开源学习仓库Agent_Memory_Techniques（github.com/NirDiamant/Agent_Memory_Techniques，Apache-2.0，约1119星、141 fork，Jupyter Notebook，作者NirDiamant）。文章称仓库宣称提供30个可运行Notebook，覆盖conversation buffer、向量库、知识图谱、情景/语义记忆，以及MemGPT、Mem0、Letta、Zep、Graphiti等框架和LoCoMo等评测/生产向模式；README含Learning Paths与Decision Tree，可按场景选学、不必全啃。文章提醒“Learn every agent memory technique”是营销表述，正文用“覆盖主流路线/三十种整理”即可；具体目录是否恰好30、各框架示例完整度以仓库当时目录为准，本文不报未截图题数。付费课Prompt to Production与图书Agent Memory Made Simple是作者周边，非仓库使用前提；仓库本体免费开源，不承诺学完即上生产。"
+ },
+ {
+  "i": 241,
+  "title": "删了聊天记录，AI就真能忘掉你的秘密吗？港科广、中科大等推出MEMCUT，揭开Agent记忆“表面失忆”假象",
+  "account": "学术头条",
+  "summary": "论文提出MEMCUT基准，评测LLM Agent长期记忆在用户请求删除敏感信息后的“真遗忘”能力。基准含15个跨1-3月场景、490会话、43402轮、约174万token、456个秘密；每个秘密标注直接披露、平均8.1条跨8会话的隐式证据和26.6条干扰项，覆盖事实拼接、关系链、数值汇总、时间/状态推理四类证据链，平均最小割集3.04轮。指标区分原生恢复率Nat（系统检索器答对比例）与残余恢复率Res（直接把存活记忆给阅读模型可还原比例），并定义隐蔽风险占比Hid=(Res−Nat)/Res。在5种记忆架构（Turn/Session RAG、MemoryBank、Nemori、LightMem）×4模型共20组合上，仅删直接披露后残余恢复率仍达85%-99%；LLM辅助清理后仍有39%-76%可推导，且隐蔽风险占比在14个配置中>50%，关系链最难清除。控制变量显示扩大候选池（20→60）比增加删除预算更有效，Res≈13×(8.2−k)（R²=0.95），瓶颈是检索覆盖率不足导致的“够不着”。局限包括受控构建、仅文本记忆、源级度量未反映误删与效用损失。"
+ },
+ {
+  "i": 242,
+  "title": "Agent 记忆开始在后台「做梦」：什么时候整理、谁来批准、原文留不留 | Semantic语义技术洞察-1026期",
+  "account": "Dataer数人",
+  "summary": "本期周报围绕Agent记忆整理（后台“做梦”）展开，总结三个问题：何时整理、谁批准、原文是否保留。Databricks发布Agent Memory（Beta，10月20日），记忆存于Lakebase，MemCurrent设计将会话原始记录只追加、提炼记忆存为可变表；用户明确要求由工具即时写入，其余交给离线dreaming流水线整理，内部基准通过率68.4%，约为无记忆三倍，消融显示离线dreaming贡献大于在线工具。OceanBase PowerContext v1.4.0新增“梦境”，由人显式发起复盘，系统提出原子记忆、Profile、Topic Memory等修订建议并走Candidate审核；便签可设过期，修订历史可对比恢复。EverOS 1.5.0的/add支持async_mode，先写SQLite队列返回202，后台按会话顺序抽取；失败批次不自动重试，Markdown原文为唯一事实来源，索引可重建。论文《Let Them Sleep》提出RSPM，周期性聚类失败提炼短规则并删除原始记录，报告SWE-bench模拟+9.1、时间一致性+11.9、LoCoMo-10+7.6，重"
+ },
+ {
+  "i": 243,
+  "title": "Agent 跑长任务总在中途\"失忆\"：先搭内存，再谈智能",
+  "account": "AI极客周",
+  "summary": "文章以月度对账Agent第5步忘记“净额不含税”规则为例，指出长任务翻车多因缺乏内存架构而非模型能力。将失忆分为窗口截断/压缩丢信息、跨会话无持久状态、长期记忆按相似度召回把过时结论顶到前面三类。提出OS式三层内存：工作内存只放当前scratchpad、步骤结束即清；情景内存按事件+时间戳存向量库并带时间衰减；语义内存沉淀稳定事实与规则、去重合并、写进system提示或独立知识区。工程上建议长文本/中间产物外置为文件或工具，上下文只留路径+摘要+关键字段；状态用结构化JSON；压缩要“损失感知”，用固定schema保留决策点、约束、ID/金额/日期，并把关键约束双写进system提示。内存上线需做回忆测试、跨会话一致性检查，指标包括约束遵守率、关键信息召回率、跨会话一致率并接入CI。文末给出实操清单，并说明幅度类数字为公开工程复盘常见区间，非精确统计。"
+ },
+ {
+  "i": 244,
+  "title": "Codex 一换会话就失忆，我把记忆搬进了这个 4.7k Star 的开源项目",
+  "account": "小羊成长之路",
+  "summary": "作者试用开源项目tigerless-labs/agent-memory（MIT，Python，版本0.1.0，截至2026-10-25约4,725星、202 fork，建库2026-09-01）。该项目不依赖向量数据库，把记忆写成Markdown文件，索引只是可随时删除重建的缓存；Claude Code、Codex CLI、Hermes共用一份store，无需API key。mem init建store并生成decision/entity/event/experience/fact/preference/procedure/profile/reference九类记忆，一条记忆一个<type>/<group>/<name>.md文件；mem recall只返回L0摘要与路径，按需mem read/trace展开，避免塞满上下文。接入靠mem setup --host，会话边界自动触发写入并把原始trace拷进archive/，之后有默认24小时/3会话的睡眠整理；自动只新增更新，删除仅提案，物理删除需mem gc。作者在LongMemEval-S（12会话、120段）上跑得agent-m"
+ },
+ {
+  "i": 245,
+  "title": "告别写时固化：Just-in-Time Memory让LLM Agent按需定制",
+  "account": "paper艾克赛",
+  "summary": "论文提出Just-in-Time Memory（JitMem），把LLM Agent记忆策展从写时移到读时：记忆库只保存未抽象的原始轨迹，当前任务到来后由BM25检索相关轨迹，memory curator（唯一可训练组件，Qwen3-8B初始化、GRPO训练）结合任务与轨迹现场合成任务自适应紧凑payload，交给冻结executor执行；只有被executor-as-judge判定成功的轨迹才写回记忆库，payload不存储。这使信用分配压缩为单步即时奖励，无需任务分组。实验在ALFWorld、WebShop、-bench上进行，相对最强基线绝对成功率分别提升16.2、16.3、3.9点，输入token降低50.3%–56.3%、executor步数降低28.4%–31.4%，并支持训练一次跨executor迁移。分析显示即使不训练curator，读时策展也已持平/优于强写时基线；消融表明任务条件化、成功轨迹过滤、原始轨迹保留各自有贡献。文末在“超过使用 GPT-5.4 作 curator 的 ReasoningBa”处截断，后续比较内容缺失。"
+ },
+ {
+  "i": 246,
+  "title": "又一个火爆跨AI记忆系统TencentDB-Agent-Memory，Agent团队共享记忆，减少重复劳动",
+  "account": "万水千山踏歌行",
+  "summary": "介绍腾讯云开源项目 TencentDB-Agent-Memory（v2.0.0，TypeScript，MIT，Node≥22.16），将对话、文档、代码转化为四类团队级记忆资产：Chat Memory（L0–L3分层精炼）、Skill（带版本/触发边界/步骤/校验）、LLM-Wiki（结构化链接页面）、CodeGraph（代码符号与调用关系）。通过 MemoryCore/MemoryProxy/MemoryPanel 三服务与代理改 base URL 接入，不改协议、零代码改造已有 Agent；支持从现有仓库/文档/会话冷启动导入。权限四档（private/team/restricted/agent），资产按需检索注入而非全量入上下文。官方称 PersonaMem 得分由 48% 升至 76%（+59%，自报）。边界：Wiki/CodeGraph 异步构建，CodeGraph 优先公开 HTTPS 仓库，路由目前手动绑定，需自配 LLM 参数。"
+ },
+ {
+  "i": 247,
+  "title": "智能体记忆（Agent Memory）原理与生命周期",
+  "account": "苏哲管理咨询",
+  "summary": "文章以编者摘要和 10 个 Q&A 讲解 Agent Memory 的概念与生命周期。记忆是跨会话持久存储的信息，必须检索后注入上下文才生效，与上下文（当前轮临时信息）区分。记忆用于留存偏好、项目信息、决策与事件，支撑任务接续与决策优化。类型包括短时、长时、情景（事件过程）与语义（独立事实）记忆。生命周期五步：提取、存储（文件/DB/向量库/专用系统）、检索（精确/关键词/语义/混合）、更新（区分全局偏好与项目约定）、遗忘（彻底移除）。检索与上下文工程相互独立：检索取存量记忆，上下文工程筛选组织给模型。附 GitHub 示例演示提取、检索、更新与注入 Prompt。"
+ },
+ {
+  "i": 248,
+  "title": "腾讯Hy-Memory：让Agent学会正确记忆",
+  "account": "林浩杨",
+  "summary": "解读腾讯混元 Hy-Memory-30B-A3B 论文，核心是把 Agent 的“记忆能力”作为可训练能力，重点训练 Memory Writer，使其学会选择长期保存内容、书写不丢细节、更新变化信息并拒绝存储废话。针对长期 Memory RL 的 Credit Assignment 问题，论文用 Probe（每 chunk 小测验）、ORM（跨 chunk 下游效用）、Gold Fact（奖励归因）、Trap（防止全存）+ Growth Penalty（抑制记忆膨胀）、Chunk-level GRPO（同 chunk 位置比较 rollout）细化奖励。两阶段训练：Stage1 OPD 学会操作 Memory 框架，Stage2 Memory RL 学会写好记忆。统一测试中 Hy-Memory-30B-A3B 得 55.49，略高于 Claude Opus 5 的 54.62；在未参与训练的 EverMemOS 上为 56.89 对 54.04。局限：关键模块消融实验不完整，无法分离各组件贡献。"
+ },
+ {
+  "i": 249,
+  "title": "Cloudflare Agent Memory：从无状态到有状态的范式转移信号",
+  "account": "智研AI小冀",
+  "summary": "文章将 Cloudflare 推出 Agent Memory 解读为从“无状态 Agent”到“有状态 Agent”的范式转移信号，而非单纯存储服务。AI Agent 对话本质无状态，每次从零开始；Cloudflare 把记忆做成边缘 KV 存储等基础设施，使记忆成为默认能力。作者区分“无状态对话”与“有状态协作”范式，指出基础设施化带来标准化收益，但也付出抽象成本：失去底层控制、增加记忆结构/更新/遗忘/隐私设计复杂度。适用场景为需跨会话上下文且延迟敏感的产品（如 SaaS 嵌入 Agent、企业知识库）；单次问答工具则过度设计。建议先用数据库/JSON 验证有记忆 Agent 的价值，再跟进基础设施。"
+ },
+ {
+  "i": 250,
+  "title": "腾讯开源Agent记忆中枢，狂揽近3万Star",
+  "account": "江狐随笔",
+  "summary": "二次报道腾讯云开源 TencentDB-Agent-Memory（29813 Star、2892 Fork，TypeScript，MIT）。四类资产：Chat Memory（L0 原始对话至 L3 长期画像分层蒸馏）、Skill（版本/触发边界/步骤/校验）、LLM-Wiki（链接图结构化文档）、CodeGraph（代码符号与调用影响）。检索分层：日常用 L2/L3 冷启动，精确事实回落 BM25+向量+RRF 打 L1/L0，并受条数/字符/超时闸门限制。Memory Hub 用 Fixed Binding + ACL 按 Team/User/Agent/visibility 收敛权限；Agent 通过 /v3/tools/list 与 /v3/tools/call 按需调用，不全量注入。接入仅改 base URL 的 Proxy。PersonaMem 48%→76%（+59%，官方）。坑：Wiki/CodeGraph 异步构建需 ready，CodeGraph 优先公开 HTTPS，自动路由在迭代，Node≥22.16，MongoDB 后端实验性。v2.0.1 路线图含零配置冷启动"
+ },
+ {
+  "i": 251,
+  "title": "深度｜Agent记忆系统解析",
+  "account": "XSecurity",
+  "summary": "全景报告梳理 2026 年 Agent 记忆系统进展。记忆形态从扁平文本走向可执行结构：MaC（记忆即代码，原子/关系/模块三层，检索编译为程序，准确率最高 +15.91%）、Zep/Graphiti（双时间知识图谱，DMR 94.8%）、A-MEM（卡片网络）、Hindsight（四网络证据分层，准确率 39%→83.6%）。生命周期治理成为焦点：REM 在 think-act 循环内管理存/召回/忘（SWE-ContextBench 修复率 27.6% 对 24.9%，成本 -17%）；LightMem 睡眠时间巩固省 token 最多 38 倍。程序性记忆方面，SPEM 用技能 DAG（ALFWorld 87.1%），ReasoningBank 蒸馏推理策略并发现“经验越多越差”。源码解剖 Mem0（体外管道、审计历史）、Letta（上下文 Block + 工具调用，tag 0.16.8）、Graphiti（双时间边失效）。评测存在争议（LoCoMo 答案键错误、厂商刷分），安全需可验证记忆治理。趋势：治理>检索、结构可执行、程序性记忆、垂直模板、评测安全补课。"
+ },
+ {
+  "i": 252,
+  "title": "2026年10月中国数据库流行度排行榜：AI Agent 成了新战场，记忆与上下文先入局",
+  "account": "墨天轮",
+  "summary": "2026 年 10 月中国数据库流行度排行榜发布，OceanBase 居首，达梦、金仓次之；十强中 TDSQL 与 GBASE 互换。重点观察是 AI Agent 成为国产数据库新战场，多家厂商同月跟进记忆与上下文：OceanBase 推出 PowerMem/PowerContext（v1.2.0 适配 Jev、Laya 并引入记忆写入质量校验），PolarDB Mem0 更名 PolarDB Agent Memory，腾讯云在数据库 AI 服务引入 Agent Memory/Team Memory，华为云 DAS 公测，阿里云推 Agent Context/ApsaraLakebase，openGauss 7.0.0 LTS 写入 oGMemory。文章指出上下文层共同工程问题是“给数据库装 Git”（可回滚审计），记忆落点由个人转向团队；海外 Oracle/MongoDB/Redis 将记忆做成治理面与公开基准（Redis LongMemEval 86.5%）。份额侧 IDC 显示金融分布式事务型数据库市场 3.7 亿美元、同比 32.1%。"
+ },
+ {
+  "i": 253,
+  "title": "Agent 记忆",
+  "account": "植物练习生",
+  "summary": "文章概述 Agent 记忆的设计要点。短期记忆置于上下文窗口，仅当前任务可见，可用滚动摘要/滑动窗口或卸载到长期记忆；长期记忆置于向量/关系/KV 存储，存前需重要性评估并可加时间权重衰减。长期记忆分情节记忆（具体事件经历）、语义记忆（跨经历提炼的通用知识）与程序记忆（操作流程 SOP）；另有感知记忆（原始输入）与实体记忆（结构化关键事实）。存储选型：非结构化语义检索用向量库，结构化偏好/状态用关系/KV，混合存储为主流。使用方式结合 session 开始主动检索注入 system prompt，与执行中被动 Tool 检索。框架方面对比 Mem0（独立服务层）、Letta/MemGPT（core memory 常驻上下文 + 工具调用）、Zep/Graphiti（时序知识图谱，带有效时间窗口）。知识图谱以三元组补关系推理，与向量库双路召回；记忆整合需去重、冲突消解（保留更新）与抽象提炼（情节转语义）。"
+ },
+ {
+  "i": 254,
+  "title": "GitHub 1.2w stars，又一款顶级Agent记忆系统火了",
+  "account": "架构文摘",
+  "summary": "本文是公众号「架构文摘」对开源项目 ai-memory 的介绍。项目作者 Fabio Akita，GitHub 约 11,961 star。它针对多 Agent/多机器/多项目场景下记忆锁死在单一工具的问题，提供跨 Agent、跨机器、跨项目、跨人的长期记忆。系统为 Rust 单二进制，启动 MCP/HTTP server 并独占数据目录：wiki/ 为 git 版本化 Markdown 真相源；db/ 为 SQLite 派生索引，使用 FTS5 全文、实体、图邻居的 RRF 融合检索，可选向量；raw/ 存脱敏原始会话片段。数据流为 capture→consolidate→recall→handoff：生命周期 hooks 记录 prompt 与工具调用，会话结束编译为可读 Markdown，下一会话在任意 agent、任意机器获得 handoff 简报并可全文搜索。默认零 LLM，capture、search、handoff 全离线，不需 API key；LLM 整合、语义向量、dream 冷笔记整合为 opt-in。handoff 为类型化协议，每条有 owner 且只被认领一次"
+ }
+]

@@ -16,7 +16,7 @@ test('public allowlist excludes source bodies paths settings and credentials', (
 });
 test('render responsive static site with complete catalog version URLs and local-only script', async (t) => {
   const dir = await temporary(t); const result = await renderSite({ siteDir: dir, edition: edition(), history: [{ date: '2026-10-25', version: 1, title: 'Yesterday', articleCount: 3 }], publicBaseUrl: 'https://wswsmao.github.io/ai-tech-daily/' });
-  assert.equal(result.reportUrl, 'https://wswsmao.github.io/ai-tech-daily/reports/2026-10-26/v1.html');
+  assert.equal(result.reportUrl, 'https://wswsmao.github.io/ai-tech-daily/reports/2026-10-26-1/v1.html');
   const html = await fs.readFile(path.join(dir, result.reportPath), 'utf8');
   assert(html.includes('name="viewport"')); assert(html.includes('data-search')); assert(html.includes('data-topic')); assert(html.includes('<details data-article')); assert(html.includes('aria-live="polite"'));
   assert(html.includes('本期存在覆盖')); assert(html.includes('Content-Security-Policy'));
@@ -31,7 +31,7 @@ test('render responsive static site with complete catalog version URLs and local
 test('unsafe links and private values reject public render', async (t) => {
   for (const url of ['javascript:alert(1)', 'file:///D:/private', 'https://127.0.0.1/x', 'https://user:password@example.org/x', 'https://[::1]/x', 'http://10.0.0.1/a']) assert.throws(() => publicSourceUrl(url), { name: 'SiteRenderError' });
   const raw = edition(); raw.articles[0].summary = 'C:\\Users\\admin\\secret.txt'; assert.throws(() => projectPublicEdition(raw), { code: 'PRIVATE_PUBLIC_FIELD' });
-  assert.throws(() => validDate('2026-02-30')); assert(!isPublicSitePath('../secrets.json')); assert(!isPublicSitePath('reports/2026-10-26/../../credentials.json'));
+  assert.throws(() => validDate('2026-02-30')); assert(!isPublicSitePath('../secrets.json')); assert(!isPublicSitePath('reports/2026-10-26-1/../../credentials.json'));
 });
 test('no truncation of article catalog and empty editions are valid', async (t) => {
   const dir = await temporary(t); const raw = edition(); raw.articles = Array.from({ length: 120 }, (_, i) => ({ title: `Article ${i}`, url: `https://example.org/${i}`, category: '模型' }));

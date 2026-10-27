@@ -1,0 +1,92 @@
+[
+ {
+  "i": 150,
+  "title": "一文读懂 Recursive Flint：48GB 电脑本地跑编码智能体，每秒 125 token 的开源新选择",
+  "account": "政务数字安全纪实",
+  "summary": "据正文，Recursive Superintelligence（Richard Socher创办）于2026年10月21日开源首款模型Flint：39.8B总参MoE，每token激活约2.5B；49层（前2层稠密、后47层MoE），每MoE层256专家选6+1共享，注意力含35层滑窗513、14层全局无位置编码及GQA（32查询头/4KV头）。4-bit量化权重约23GB，48GB内存Mac（M4 Pro/M5 Pro/Max）或N卡可跑；官方称M4 Pro上超125 token/s、RTX Spark 64GB超150（Nvidia称实测可超220），上下文262,144 token（博客称最高512k）。Eureka Machine自动研究系统参与架构、量化与内核搜索。自报（温度1.0）SWE-bench Verified 74.2%、SWE-bench Pro v2 89.7%（自测口径）、LiveCodeBench v6 80.3%、Terminal-Bench 2.1 54.9%。短板：纯文本不识图；复杂终端任务弱于稠密Qwen3.8；4-bit与BF16差0.7分以内；成"
+ },
+ {
+  "i": 151,
+  "title": "编程智能体换外壳：分不涨，账单差3倍",
+  "account": "飞哥AI科技杂谈",
+  "summary": "正文报道山东大学团队论文《What Does a Harness Buy? Tokens, Mostly》的实验：在SWE-bench Verified上，用5个开源模型比较Claude Code 2.1、mini-SWE-agent（约100行Python、仅bash）、OpenCode 1.18三个harness。最重外壳Claude Code每步发送16581 token系统提示词/工具定义，mini-SWE-agent仅829，OpenCode 7025。大题库上Claude Code与mini-SWE-agent在两款千问模型上分差1.8和1.4分且mini略高，统计打平；最难45题换外壳结果翻转率13%，与同外壳重跑的翻转率13%相当，换模型仅22%。同一模型同批题每题花费最多差3倍（GLM-5.3-Flash：Claude Code 1.81元、mini 0.97元、OpenCode 0.56元）；缓存命中96%-99%只整体打折。OpenCode最多落后9分，主因之一是思考超32K被截断而不续写。局限：仅一套代码题，45题样本小，447题仅能分辨约5分；Claude O"
+ },
+ {
+  "i": 152,
+  "title": "3万亿参数的 Kimi K3.1 Pro：编程智能体实测 65.7%，超 GPT-6 Astra 7.5 个点",
+  "account": "智观所",
+  "summary": "据正文，月之暗面于2026年10月24日发布Kimi K3.1 Pro：总参2.8万亿、激活1040亿、上下文100万token，沿用7月16日K3基座仅做后训练，未重训；同日上线Highspeed提速版（价格2倍）和3D Make。官方称Terminal-Bench 4.0得分65.7%（Artificial Analysis实测67.2%），GPT-6 Astra为58.2%，Claude Opus 5.5为66.4%，前代K3仅12.6%；Kimi Code Bench 3.0 Long-horizon 61.2%。3D Make可编写并运行Blender/CAD脚本，BenchCAD 92.7%。幻觉率方面，Kimi Hallu Bench Hard断言级幻觉率从23.4%降至8.3%，含事实错误回答比例为前代42.4%；OfficeQA Pro v2 64.4、SpreadsheetBench v2称全球最佳。API输入/输出/缓存三项价格较前代降33%。文末提及月之暗面计划赴港IPO、估值约500亿美元（产业信息，非模型技术）。分数多为官方/机构实测口径，部分自报；完整权重"
+ },
+ {
+  "i": 153,
+  "title": "编程智能体用上你已登录的 Chrome：六种方案横评，从官方扩展到开源通吃",
+  "account": "DT TechDaily",
+  "summary": "Browser Use团队10月25日发布六种让编程智能体使用已登录Chrome的方案横评（作者Gregor Zunic）。方案含Anthropic官方Claude in Chrome（仅Claude Code、需订阅）、Playwright MCP扩展模式（任何MCP客户端、单标签页、免费Apache-2.0）、Chrome DevTools MCP自动连接（调试强、看整个profile）、Gemini CLI内置代理（零安装、域名单与动作上限）、ChatGPT浏览器扩展（Codex桌面版、站点级询问）、Browser Harness（自家MIT开源、通吃主流智能体、看整个浏览器、默认开遥测）。核心机制均通过扩展或CDP附加真实Chrome以复用登录态/Cookie。权限粒度从单标签页到整个浏览器不等；提示注入被Anthropic视为最大风险，Opus 4.8内部测试攻击成功率低于0.08%但非零。作者建议权限粒度优先于兼容性，敏感账户须用独立Chrome profile并永不附加。注意作者为Browser Use联创，对方案六有自卖自夸嫌疑。"
+ },
+ {
+  "i": 154,
+  "title": "【AI早讯】BOSS 直聘实验室开源 33B「南边」：同档开源编程智能体自称领先",
+  "account": "AI早一步丨资讯与PDE计算",
+  "summary": "本文为10月26日AI早讯，含5条。#1：BOSS直聘旗下Nanbeige LLM Lab于10月25日开源Nanbeige4.3-33B，约330亿参数稠密文本模型、上下文约51万token、Apache 2.0并附Base版；实验室自测Terminal-Bench 2.1为80.9，高于Qwen3.8-27B的73.0，4bit量化显存约24GB，独立复现未至。#2：Google Cloud AI Research等开源RRSI（Regularized Recursive Self-Improvement of Agent Harnesses），仓库google-research/rrsi、论文arXiv:2609.24972；方法冻结模型权重，仅让harness自动改、自动挑并加入正则约束，论文称较无正则演化少花约30% policy token，配终端/文档/工程三Domain的git worktree筛选。#3：英国政府筹建AI Biosecurity Lab，先投约1亿英镑，OpenAI与Anthropic承诺最高约2亿英镑算力/额度，DeepMind与Basecamp R"
+ },
+ {
+  "i": 155,
+  "title": "你的代码库，才是AI编程智能体最重要的提示词",
+  "account": "深度记事",
+  "summary": "文章（Medium/Level Up Coding）观点：AI编程智能体在生成代码前会先读现有代码库，因此代码库本身就是主要提示词。作者指出智能体通常只处理代码库切片，文件因请求相关或结构联系（import、函数调用、共享类型）被拉入；命名、显式类型与docstring决定检索入口，如persistInvoiceUpdate优于handle(d: any)。系统边界应配运行时schema（如Zod）以在API/消息跨边界时校验；按功能而非按层划分目录可降低跳转成本；重复逻辑会误导智能体只更新一份拷贝；测试为agent提供可检验反馈回路。文末给出粗略导航性检查：仅用跳转定义/查找引用追踪功能，跳转过多说明可导航性差。文章强调这些人类可读实践同时也是agent可推理性实践，代码库已成为AI基础设施；未提供量化实验，仅为经验性新思路。"
+ },
+ {
+  "i": 156,
+  "title": "零代码 6 步搭出你的第一个智能体（附可直接复制的完整提示词）",
+  "account": "AI研习团",
+  "summary": "本文是零代码平台Coze（扣子）的入门教程，面向无编程基础用户，目标为搭建“文案写手”智能体。步骤为：注册扣子/飞书账号；创建智能体并进入编排页；编写人设与回复逻辑（提供完整提示词，含角色、黄金标题、致命开头、痛点爆破、SCQA、转化结尾等技能与限制）；添加AI搜索/链接读取等插件；选择豆包通用模型Pro或DeepSeek R1；在预览调试3-5轮；发布到扣子商店、豆包、飞书、抖音、微信或API。进阶可加知识库（表格/文档）和工作流（如每日资讯日报）。文章称选平台首推扣子（coze.cn），综合能力最强、发布渠道最广，并强调不懂代码也能搭建。“提示词是灵魂”。全文为平台操作导向，未给出新技术机制、实验或技术结果。"
+ },
+ {
+  "i": 157,
+  "title": "多智能体联合编程：一个人怎么带一支虚拟研发团队",
+  "account": "圣徒受难者数字游民",
+  "summary": "文章讨论多智能体联合编程。引用Stack Overflow 2026调查（169国、超3万开发者；66%用AI编程助手，26.2%用agent工作流，31%深度用户每天超4小时）。作者观点：单agent受上下文物理极限限制，需拆分为架构师（Planner，用强模型，产出带验收标准任务清单）、实现者（Coder，便宜模型）、评审者（Reviewer，独立agent，只看diff）、测试者（QA）。实测数据：同一12000行Next.js项目四个重构任务，Cursor单agent长循环21分40秒完成但CI一次通过1/4；Claude Code多子agent 34分55秒、CI一次通过3/4。MetaGPT传递文档/图表/规格（非对话）Pass@1达85.9%，高于ChatDev。落地细节：状态外置到agent之外（可跨会话继续才有编排器）、用git worktree物理隔离、设路径白名单/命令权限/最大迭代轮次预算。建议先单agent跑通，再拆reviewer、外置状态、按阶段拆planner/coder/tester；工具选型上，开发会话用Claude Code subagent/Cu"
+ },
+ {
+  "i": 158,
+  "title": "一人公司敢让编程智能体无人值守吗：十月三款工具集体装\"安全带\"",
+  "account": "启迪之星国知",
+  "summary": "文章称2026年10月6日至9日，Claude Code、OpenAI Codex、Cursor CLI三款编程智能体更新均围绕安全护栏而非模型智能：Claude Code v2.1.295新增onFailure:\"block\"，使钩子启动失败、超时或异常退出时阻断动作；Codex 0.162.0新增托管式git工作树，隔离并行任务；Cursor CLI（2026.10.08）对递归、强制、通配符删除且目标路径可能不一致的操作要求先批准。文章结合路透社2026年8月27日报道的勒索组织滥用编程智能体案例，指出无人值守风险，并给出默认失败阻断、破坏性操作人工确认、隔离运行环境、把智能体当员工管理等建议。"
+ },
+ {
+  "i": 159,
+  "title": "你的AI编程助手被人“掏”了：OpenCode密钥泄露，有用户被刷走上千美元",
+  "account": "网络安澜",
+  "summary": "文章据钛媒体报道称，编程智能体OpenCode控制台被攻破，约1.4%用户的第三方模型API Key泄露，有用户被盗刷超上千美元。文章分析称，编程智能体同时持有代码访问权限和付费API密钥，密钥泄露会使攻击者借用户账户调用模型服务并推高账单，权限过大时还可能触及代码与数据。给出的防护建议包括：不要把密钥写入代码、配置或聊天记录等可被智能体读取的位置；为AI助手配置最小权限（单仓库而非全部仓库、普通账号而非管理员）；监控模型费用异常与控制台陌生调用，发现后第一时间吊销并轮换密钥。"
+ },
+ {
+  "i": 160,
+  "title": "《AI 实践课》第 8 讲｜AI 编程助教：零基础也能写出第一段代码",
+  "account": "Eureka Moments",
+  "summary": "《AI实践课》第8讲面向零基础学习者，提出把AI当作编程助教而非替身：先自己用中文写出解题步骤或伪代码，再自己写代码；报错时让AI解释含义与可能原因并只给修改提示，不直接给完整代码；程序跑通后逐行自解释并用AI复查。文中以计算平均分的小程序为例，展示缩进错误IndentationError和字符串与数字拼接导致的TypeError及用str()修复的过程，并给出三个提示词模板：报错求助（只给提示）、逐行解释（并出题）、代码复查（只列问题建议）。文章还提醒AI代码可能能运行但结果错误、可能编造不存在的函数或工具包、写法可能过时、不要一次生成过长代码、勿粘贴隐私密钥；作业直接提交AI生成代码可能被认定抄袭，需能讲清每一行。建议掌握基本语法后再尝试编程智能体，看不懂的代码不要提交或运行于重要数据。"
+ },
+ {
+  "i": 161,
+  "title": "2026编程智能体三国杀：Codex、Claude Code、国产选手怎么选",
+  "account": "AI云前哨",
+  "summary": "文章对比2026年Codex、Claude Code与国产编程智能体的选型。Codex路线侧重跨设备与工程闭环：新版Codex CLI支持语音启动、/agents视图分派多智能体、编辑提示词、恢复会话和内置worktree，Codex Cloud可在电脑、手机、云端接力；VS Code扩展约980万次安装，Codex Security Cloud可扫描GitHub仓库并准备修复。文章提到2026年7月部分用户在关闭沙箱的最高权限模式下遇缺陷，智能体误删用户主目录真实文件，OpenAI于8月19日推送执行前验证删除目标的修复。Claude Code侧重长上下文与复杂任务：Opus 5.5提供100万token上下文、最高输出12.8万token，自适应思考常开，在Terminal-Bench 4.0得66.4%、FrontierCode v1.1得54.4%，均领先GPT-6 Astra的57.9%和53.3%；API输入每百万token 4美元、输出20美元、缓存读取0.2美元，典型负载成本约低40%，Sonnet 5.5价格为Opus 5.5一半，Haiku 5.5面向高频低成本任务"
+ },
+ {
+  "i": 162,
+  "title": "从代码执行到任务持续运行：企业级 Agent Sandbox 的云原生实践",
+  "account": "火山引擎Agent社区",
+  "summary": "文章介绍火山引擎VCI Agent Sandbox，将Coding/Computer-use/RL与评测等Agent执行环境作为Kubernetes原生可声明、可回收的工作负载管理。VCI基于社区项目kubernetes-sigs/agent-sandbox，沿用Kubernetes API/kubectl、认证授权审计与RBAC，提供microvm虚拟机级隔离，并通过网络安全组限制访问；增强特性包括ImageCache前置镜像缓存、SandboxSnapShot/SandboxSnapShotClass快照与状态保留、预挂载与动态挂载的差异化存储挂载。文章给出场景实践：某Coding Agent为每个任务创建独立沙箱，按需创建、用后回收、多轮会话延续；某办公个人助理将用户文件旁路上传TOS并按授权挂载沙箱，由Agent通过E2B调用沙箱执行代码与文档处理。附录按场景推荐规格族：vci.s1面向低启动延迟/高并发的RL与批量评测，vci.u1面向长期工作空间与多轮会话，vci.n4i/n3i/n3a面向指定CPU性能，GPU系列面向沙箱内GPU任务。文章强调执行边界独立、运维方式与现有"
+ },
+ {
+  "i": 163,
+  "title": "吴恩达：AI不会让人失业，程序员依旧难招！不招没用过Coding Agent的程序员！",
+  "account": "王道程序员",
+  "summary": "文章前半部分总结吴恩达接受《经济学人》采访的观点：AI主要自动化任务而非岗位，编程Agent接走编码任务后其余环节仍需工程师；岗位边界扩大，前端趋向全栈完整交付；吴恩达称其团队不会招聘没用过AI编程Agent的工程师，要求能验证Agent处理真实仓库、拆需求、限定文件范围、检查diff、失败后接手；初级岗位仍招但要求AI原生工作能力，大学教育滞后，建议用真实项目弥补。后半部分推广王道程序员AI大模型应用开发课程，介绍四个实战项目：内部知识库（LangChain/LangGraph、RAG基础与优化、Graph RAG）、Text2SQL（SQL/SQLAlchemy、只读账号与执行检查）、医疗分诊单智能体（信息收集、状态管理、工具调用、异常转人工）、深度搜索多智能体（任务规划、子智能体、异步并行、Skills、Ragas评估）。课程还包括Python小项目、Coze/Dify低代码助手、机器翻译实战，并给出2027年第一季度开班表、早鸟优惠与扫码咨询方式。"
+ },
+ {
+  "i": 164,
+  "title": "嵌入式Coding Agent，已经开始替你点编译和烧录了。",
+  "account": "工程师进阶笔记",
+  "summary": "文章从嵌入式工程师视角指出，Coding Agent正从改源码走向操作完整工具链：在IDE侧，Qt Creator 20接入Agent Client Protocol（ACP），侧边Coding Agent可改文件、跑命令、触发构建；文档中Build and fix同时开ACP Client与MCP Server，边构建边改，Qt Creator 21 Beta默认打开ACP和MCP。VS Code的Agent mode会跑终端命令、盯编译/lint报错自纠，工具调用默认需批准。协议层上，ACP负责‘谁来聊’，MCP负责‘能摸什么’。社区项目Keil5 MCP把本机UV4.exe和探针暴露为MCP工具，能编、能改、能烧，破坏性动作需显式确认，但作者称其为早期玩具、星数不多、不能当产线件。文章引用Atlas 2026将‘Coding Agent+MCP连工具链’列为应试点方向，并以Sonar验证债务提醒编译通过不等于上板正确、Agent自测不等于独立门禁通过。建议可带审批交给Agent的动作包括本地构建、读日志修语法/链接错误、仿真、读串口；必须人审或强确认的包括目标芯片与下载算法、量产"
+ }
+]

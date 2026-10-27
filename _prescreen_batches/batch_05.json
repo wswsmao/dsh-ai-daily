@@ -1,0 +1,92 @@
+[
+ {
+  "i": 75,
+  "title": "Agent 为什么总翻车：模型之外的 Harness 才是胜负手",
+  "account": "价值思考与交叉验证",
+  "summary": "文章主张决定 Agent 落地表现的往往不是模型本身，而是模型外的 Harness（脚手架）。它先指出 Large Model Arena Agent 榜单上 Opus 5.5、GPT SOL 6.1、Fiber 5.1 Max、Gemini Spark、Argon、Fable 5.1 Max 六个“并列第一”源于 Elo 置信区间重叠的统计幻觉；精确打分 Argon 掉到第四，换 Text 榜则又与 Meta Muse Wonder 并列。行内专家测试：Opus 5.5 仅把 Harness 从深度绑定的 Claude Code 换到 OpenCode，得分“非常低”；Argon 最匹配 OpenCode，Antigravity 不论配什么模型都居中。Harness 负责调工具、编排多步、管理上下文/记忆与结果校验；validator（尤其行业独有校验器）决定“错了能否兜住”，是多步骤可靠性的护城河。Agent 能力四条决定因素为预训练、后训练、与 Harness 框架集成方式、额外 validator；提升路径等价：要么把自我 Harness/纠错训进模型，要么堆 Harness "
+ },
+ {
+  "i": 76,
+  "title": "AI Native 工程体系（三）：决定 Agent 好坏的从来不是模型——Agent Harness 深度解析",
+  "account": "赞恩的AI工坊",
+  "summary": "文章深度解析 Agent Harness：引用 arXiv 2607.03691《Don't Blame the LLM: How Agent Harness Evolution Shapes Coding Agent Quality》的受控实验——固定模型、仅跑 Qwen Code CLI 的 35 个连续版本在 50 个 SWE-bench Verified 任务上，质量波动可追溯到单个 PR；改工具描述格式使 resolve rate 掉 6 个百分点、调整上下文构造涨回 8 点；v2.3.1 把工具返回截断从 4000 提到 8000 字符，resolve rate +5.7；git 命令超时拉长 5 秒则 -3.2。Harness 分四层：工具集成、上下文构造、权限控制、执行隔离。Prompt Caching 上，Claude Code 将系统提示/工具、项目记忆、会话上下文、对话消息分为四层并按前缀匹配缓存，压缩时复用同一系统提示词以保缓存。权限有 Manual/acceptEdits/plan/auto/dontAsk/bypassPermissions 六模式；执行隔离"
+ },
+ {
+  "i": 77,
+  "title": "Agent框架系列-第一课：Agent 框架选型，先搞懂 harness 是什么",
+  "account": "麒麟Agent实验室",
+  "summary": "Agent 框架系列第一课提出，选框架前应先理解 harness：它是把大模型包起来、变成能干活 Agent 的运行时，负责工具执行、消息历史、上下文管理、安全权限、状态保存五件事，已从“薄壳”演进为“操作系统”。业内团队一年重写 harness 五次。数据称换 harness 不换模型最多涨 23.8 分；LongHorizon-Harness 仅优化 harness、模型仍用 Qwen 3.7，任务成功率从 51.8% 拉到 80.7%。原因包括模型同质化、Agent 变长变贵、生产需可追溯/可恢复。文章给出 2026 主流框架定位表：LangGraph（图状态机、可持久化/审计）、OpenAI Agents SDK（薄 SDK、handoff+护栏）、Claude Agent SDK（工具调用强、computer use）、Google ADK（多语言、A2A）、微软 Agent Framework（AutoGen+Semantic Kernel 合体）、CrewAI（角色扮演快出原型）、LlamaIndex（RAG 到 Agent 工作流）。选型核心问题：是否需要持久状态——需"
+ },
+ {
+  "i": 78,
+  "title": "Agent Harness 工程全景：LLM 智能体的七层基础设施综述",
+  "account": "AGI教学",
+  "summary": "文章导读 CMU 综述《Agent Harness Engineering: A Survey》。该综述将 Agent Harness 确立为包裹 LLM、支撑长时程任务执行的外围运行基础设施，提出 ETCLOVG 七层分类体系：执行环境 E、工具接口 T、上下文管理 C、生命周期与编排 L、可观测性 O、验证 V、治理 G，并把 170 多个开源项目映射到该框架；同时回顾从提示工程、上下文工程到 Harness 工程的演进，指出成本-质量-速度三难困境、能力-控制权衡与 Harness 耦合三类跨层挑战。引言引用证据：Bölük（2026）在 15 个模型上修改编辑工具格式及外围工具 Harness，其中一个模型编码基准提升高达 10 倍；Trivedy（2026）通过重构系统提示、注入上下文与自我验证钩子，把固定 GPT-5.2-Codex 智能体在 Terminal-Bench 2.0 的成绩从 52.8% 提升到 66.5%；Meta-Harness 表明 Harness 部分组成可自动优化，LangChain DeepAgents 仅靠 Harness 层改动也取得同样 52"
+ },
+ {
+  "i": 79,
+  "title": "AI Agent 背后的 Harness，到底是什么？｜ 深度科普",
+  "account": "东山秋月白",
+  "summary": "深度科普：从人类操作电脑的Interface讲到LLM仅生成文本、需外围系统执行。解释Tool Call：模型返回read_file等结构化请求，Harness负责识别请求、检查条件、安排执行、把结果交回模型，Tool Call≠Execution。定义Harness为围绕LLM的任务执行与运行控制系统，负责工具清单提供、Agent Loop（多轮调用直到完成/终止/中断）、上下文管理（选择/压缩/保存）、权限审批与状态恢复。辨析Claude Code（界面/CLI/Agent SDK）与Codex App Server（Thread/Turn/Item、审批事件）等产品中Interface与Runtime层次；说明MCP标准化工具/资源/提示交换但不负责上下文管理，Skills提供任务方法。给出LLM+Harness=Agent的简化教学模型。"
+ },
+ {
+  "i": 80,
+  "title": "一个连 MCP 都不支持的 Agent Harness，凭什么让开发者上头？",
+  "account": "GitHub精选",
+  "summary": "解读开源极简TypeScript agent harness Pi的1.0发布。Pi最初因给OpenClaw提供动力成名，核心刻意做小，直到v0.99仍不支持MCP，改用扩展API与prompt级定制。1.0引入三个能力：Pi Durable，用SQLite与JSONL处理长时运行agent的持久化存储和记忆，并提供适配器对接runtime/storage；Codemode，让模型生成脚本在QuickJS沙箱运行，可直接调用Pi或MCP工具并对结果转换以省token，也能跑分类器/图像模型等非LLM模型；Virtual models，用/model选择器创建虚拟模型，底层通过分类器或机制按query类型路由到不同模型，控制速度与成本。文章总结极简harness靠‘核心够小、边界够开’与可扩展扩展点赢得开发者，Codemode是‘让模型写代码处理数据而非读数据’的省钱范式。"
+ },
+ {
+  "i": 81,
+  "title": "Harness，2026 年 AI 圈最\"贵\"的一个词",
+  "account": "走1步看3步",
+  "summary": "热词专文系统梳理Harness（挽具）在2026年AI工程中的含义与产业格局。词源从马的挽具到软件测试test harness，再到agent harness；采用HuggingFace 2026-05术语表三分法：Agent = Model（权重）+ Scaffolding（提示词/工具定义/输出格式，模型可感知）+ Harness（工具执行、记忆、权限、审计、编排，模型不可感知的外围系统）。解剖五大核心能力：工具调度、Agent循环、记忆与上下文管理、权限与治理、多智能体编排。时间线列举Anthropic称Claude Code为agentic harness、OpenAI以harness命名岗位、AWS AgentCore（2026-06）托管、DeepSeek 2026-08开源Harness（MIT）。给出五层架构（工具/循环/记忆/治理/表现）、带预算与审批的Agent Loop伪代码、工具注册表、五个设计决策（事件驱动、可观测性、预算即安全、沙箱默认、协议化工具），以及评价Harness的五把尺子（任务完成率、工具可靠性、上下文效率、安全记录、可观测可复现）和三大误区。"
+ },
+ {
+  "i": 82,
+  "title": "Harness² 深度解析：谷歌让 Agent 自己改写自己的外层配置，模型权重纹丝不动",
+  "account": "晓菀舟",
+  "summary": "深度解析Google Research开源的递归式Agent harness优化框架Harness²（仓库github.com/google-research/harness2，论文arXiv:2610.14224，Apache-2.0，v0.1.0，Python 3.12/uv）。在冻结模型权重前提下，用两层递归让Agent为当前任务改写自身harness：任务级内循环Propose–Probe–Compose（先跑参考执行，提出invariant通用与domain专属两类候选，同任务/同模型/同环境探查，比较行为差异后合成精炼harness，无需ground-truth验证器，靠行为对比）；harnessing级外循环把采纳harness与有证据教训写入持久改进harness，指导下一次提议。八类可编辑组件（system prompt、guardrails、memory、skills、tool guidance、scripts、subagents、plugins）以文件挂载，可按上下文构造/工具接口/委派编排/中间件分组。支持--k并行（探宽）或串行（钻深）放大。报道单步收益：Wo"
+ },
+ {
+  "i": 83,
+  "title": "让 Agent 自己改提示词、改技能、改护栏:Harness² 好在哪,又该在哪儿留个心眼",
+  "account": "断舍离先生的奇遇",
+  "summary": "从工程批判视角解读Harness²。将harness拆为8个文件化可编辑部件（系统提示词、护栏、记忆、技能、工具指南、脚本、子Agent、插件），对应Agent产品装备栏。自我改进核心为‘提议—试探—合成’：先以当前harness跑参照，提出通用（invariant）与领域（domain）两个修改版，在同任务/模型/环境下各跑一遍并与参照对比行为差异，合成者据证据决定合并/修改/采纳/保持；无需标准答案。有效教训写入EXPERIENCE.md经验库，下任务复用但需用新证据核对。效果：单步（三次平均）GLM-5办公64.2→75.7(+11.5)、法律59.6→71.4(+11.8)，Gemini 3.5 Flash办公72.4→77.5(+5.1)、职业+4.5；底子越弱涨越多，并行5候选再涨3-7分。提醒：改harness的编辑者是更强的Claude Opus 4.8，并非弱模型自我增强；成本/token/时间未报告；默认网络不设限且Codex沙箱关闭，自改护栏系统仅适合隔离研究，勿接生产/个人重要数据。"
+ },
+ {
+  "i": 84,
+  "title": "有序发现｜不改模型，改模型外面那层： Harness² 让 Agent 自己重写脚手架",
+  "account": "有序AICampus",
+  "summary": "技术专栏详析Harness²。问题：开放世界无ground truth且harness高度特化难迁移。方法：任务级递归用Propose–Probe–Compose调当前harness，强化级递归用Experience Reflector把采纳harness与有证据教训写入improvement library；八组件文件化（system prompt、guardrails、memory、skills、tool guidance、scripts、subagents、plugin），分Context construction/Middleware/Orchestration；提出invariant（跨领域缺陷）与domain（领域知识）双视角候选，探查后行为对比合成，对比用于指导合成而非验证正确性。放大：并行k探宽、串行k钻深。结果：单步GLM-5+OpenCode在WorkBuddy-Bench+11.5(64.2→75.7)，JobBench最高+4.5，LAB Partial最高+11.8pp；弱模型配好harness可超强模型基线。k=5继续涨，Harness² k=2已超对照方法"
+ },
+ {
+  "i": 85,
+  "title": "DeepSeek Harness 解剖： 当 \"Agent 的身体\" 被拆成可插拔插件",
+  "account": "铜锣帮帮小分队",
+  "summary": "算法工程师视角解剖DeepSeek Harness（dsh）：2026-08-13开源v0.1开发者预览、MIT，主张Model+Harness=Agent。基于Cordis插件元框架，内核仅负责插件加载/卸载与依赖，其余皆插件——模型、工具、会话、沙箱、存储、Agent主循环、调度与UI均可替换，循环可换成Tree-of-Thought等。两种跑法：本地Web工作台（127.0.0.1:3080）与无头模式；四种预设（Standard/PTC/Minimal/Creative），首条消息后预设锁定。三权限旋钮：沙箱模式（read-only/workspace-write/danger-full-access，仅管文件，网络与进程隔离在沙箱外）、审批策略（ask/never）、权限预设。默认ReAct工程化循环；PTC用run_code工具写TypeScript在OS沙箱一次编排多次调用，压低长任务成本。MCP由mcp-client插件桥接，支持stdio与streamable-http，工具以mcp__前缀注册。规则动作用Hooks协议（SessionStart/UserPrompt"
+ },
+ {
+  "i": 86,
+  "title": "荣耀 Magic9 发布、系统级 Agent Harness 上手机、准确率 91.8%、手机开始自己干活",
+  "account": "数字新奇点",
+  "summary": "文章报道荣耀在 CEIC 2026 发布 Magic9，称其为行业首个搭载系统级 Agent Harness 商用架构的 AI 智能体手机，由 YOYO Harness 终端智能中枢与“魔法大模型”矩阵支撑。文中解释 Agent Harness 的作用：把大模型输出从文字建议变为界面操作指令，在执行中观察新页面并判断是否走对分支，支持跨应用连续操作与出错返回，并通过“检查点/重规划”机制缓解上百步长程任务中的目标遗忘。所引厂商/媒体称 YOYO 综合任务准确率 91.8%、可稳定完成上百步长程任务、主动服务覆盖超 1000 个生活场景；同期发布 1×3×N 生态战略与 (PI)² 物理智能伙伴计划。作者认为这是接口层/系统级智能体入口变化，而非模型层变化，并提醒 91.8% 为实验室厂商数据、缺少真实场景测试条件与“长任务第几步会崩”的指标，且智能体跨应用权限带来账号安全风险，需谨慎对待发布会指标。"
+ },
+ {
+  "i": 87,
+  "title": "一文读懂机器人多模态模型：VLM、VLA、VLN、WAM、VLX 到底能干什么？",
+  "account": "AI知识燃料库",
+  "summary": "文章科普机器人多模态模型体系，区分传统“分而治之”视觉/导航/力控算法与统一语义底座的多模态具身模型。作者定义并比较五类模型：VLM（图像+文本，开放集理解与缺陷描述，不能移动/操作）、VLA（视觉-语言-动作，输出机械臂动作序列，擅长精细操作但不擅长长距离导航）、VLN（视觉-语言-导航，语义寻路避障，但不能动手）、WAM（世界-动作模型，学习物理规律并在虚拟空间预演动作后果，用于风险预判，但柔性/非线性场景预测有误差）、VLX（Vision-Language-X 全模态融合底座，插拔扩展异构传感器并为其他模型提供统一融合特征）。文章给出以 VLX 为汇聚底座、VLN/VLM/VLA/WAM 协同的轨道交通 TVM 巡检流程，并强调多模态模型不直接驱动电机，底层仍依赖传统伺服/运动控制。"
+ },
+ {
+  "i": 88,
+  "title": "YOLO遇上多模态大模型：实时检测如何和LLM结合",
+  "account": "计算机视觉技术",
+  "summary": "作者从系统架构角度讨论 YOLO 家族实时检测器与多模态大模型（MLLM）如何结合。先对比二者时间尺度：YOLO 是毫秒级前馈、确定性、一次性前向的检测链路；MLLM 由视觉编码器、连接层和自回归 LLM 组成，延迟随输出长度线性增长、有状态串行。文章总结五种工程形态：1）级联，YOLO 出框并裁剪局部图+坐标给 LLM 做语义理解，需控制 token 预算、坐标精度与异步队列；2）开放词汇/视觉定位，用图文对齐空间让文本 prompt 动态构造分类头；3）MLLM 当老师蒸馏 YOLO，注入关系/属性软标签；4）YOLO 为 MLLM 提供前级区域特征或注意力掩码，实现视觉 token 稀疏化；5）YOLO 作为被 LLM 函数调用的工具。作者强调若输出只供机器做坐标动作则不应引入 LLM，并列出延迟预算、NMS/阈值后处理、检测器与 LLM 量化差异、流式异步语义滞后、视觉 token/KV cache 等约束，推荐“毫秒检测通道+秒级异步语义通道+按需路由”的落地结构，并提出分层评估与失败归因。"
+ },
+ {
+  "i": 89,
+  "title": "2026年轻松突破年薪30W，试试Transformer与VLM开发",
+  "account": "OpenCV学堂",
+  "summary": "本文是 OpenCV学堂 的多模态 VLM 开发课程推广文。开头简要介绍多模态大模型（MLLM）“编码-对齐-解码”路径与零样本工业缺陷检测背景，随后重点宣传 2025 年研发的“多模态工业零样本缺陷检测课程”。课程大纲覆盖神经网络基础、Transformer/自注意力/BERT/GPT、ViT/DeiT/Swin/RT-DETR/RF-DETR、CLIP、DINOv2/DINOv3、SAM1-3，以及 Qwen-VL、InternVL 等 VLM 的图像分类、检测、OCR、零样本异常检测/分割、PCA、小样本训练与知识蒸馏。文章称该方向可应对开放词汇新缺陷，并给出“工业支持急速五分钟换型、四张参考样本准确率可以达到99%”的宣传性表述；结尾引导扫码加助手、拼团报名，原价1199、拼团999，并以“2026年轻松突破年薪30W”“掌握核心主动权”等营销话术促单。"
+ }
+]
