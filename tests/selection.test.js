@@ -44,10 +44,22 @@ test('quality judgement round-trips through the model schema', () => {
   assert.equal(validateQuality({ novelty: 5, specificity: 0, depth: 0, firstHand: 0, honesty: 0 }), null, 'out-of-range dimensions are rejected');
 });
 
-test('an article judged below the floor is dropped, never padded', () => {
+test('a pool smaller than the target keeps every article, even weak ones', () => {
+  // Seats are empty, so a below-floor article is better than a gap. The floor only earns its keep
+  // once there is competition for seats.
   const r = selectEdition([art(weakQuality)], { target: 30, minScore: 6 });
-  assert.equal(r.stats.selected, 0);
-  assert.equal(r.stats.belowThreshold, 1);
+  assert.equal(r.stats.selected, 1);
+  assert.equal(r.stats.shortPool, true);
+  assert.equal(r.stats.belowThreshold, 0);
+});
+
+test('with more candidates than seats, the floor drops weak articles', () => {
+  const strong = Array.from({ length: 29 }, (_, i) => art(goodQuality, { id: `s${i}`, prescreen: { category: 'application', keep: true, point: `strong point ${i}` } }));
+  const weak = Array.from({ length: 5 }, (_, i) => art(weakQuality, { id: `w${i}`, prescreen: { category: 'application', keep: true, point: `weak point ${i}` } }));
+  const r = selectEdition([...strong, ...weak], { target: 30, minScore: 6 });
+  assert.equal(r.stats.selected, 29, 'weak articles are not used to pad the edition');
+  assert.equal(r.stats.belowThreshold, 5);
+  assert.ok(!r.stats.shortPool);
 });
 
 test('an unjudged article is kept rather than silently discarded', () => {
