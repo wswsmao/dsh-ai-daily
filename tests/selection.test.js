@@ -16,6 +16,28 @@ const art = (quality, over = {}) => ({
 const goodQuality = { novelty: 2, specificity: 2, depth: 2, firstHand: 1, honesty: 2, total: 9 };
 const weakQuality = { novelty: 0, specificity: 0, depth: 0, firstHand: 0, honesty: 0, total: 0 };
 
+test('an article with no pre-screen verdict never enters the edition', () => {
+  // This is the shape produced when pass 2 opened articles without a keep-list: high score, but the
+  // gate never ran on them. Industry reports reached the edition exactly this way.
+  const ungated = art(goodQuality, { prescreen: undefined, id: 'bad' });
+  const gated = art(goodQuality, { id: 'ok' });
+  const r = selectEdition([ungated, gated], { target: 30, minScore: 6 });
+  assert.equal(r.stats.selected, 1, 'only the pre-screened article is eligible');
+  assert.equal(r.articles[0].id, 'ok');
+});
+
+test('an article the model explicitly rejected is never selected', () => {
+  const rejected = art(goodQuality, { prescreen: { category: 'application', keep: false, point: 'x' }, id: 'rej' });
+  const r = selectEdition([rejected], { target: 30, minScore: 6 });
+  assert.equal(r.stats.selected, 0);
+});
+
+test('a high score cannot rescue an ungated article', () => {
+  const perfect = art({ novelty: 2, specificity: 2, depth: 2, firstHand: 2, honesty: 2, total: 10 }, { prescreen: undefined });
+  const r = selectEdition([perfect], { target: 30, minScore: 6 });
+  assert.equal(r.stats.selected, 0, 'gating happens before quality ranking');
+});
+
 test('quality judgement round-trips through the model schema', () => {
   assert.deepEqual(validateQuality({ novelty: 2, specificity: 1, depth: 2, firstHand: 1, honesty: 2 }), { novelty: 2, specificity: 1, depth: 2, firstHand: 1, honesty: 2, total: 8 });
   assert.equal(validateQuality(null), null);
