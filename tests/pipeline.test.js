@@ -6,12 +6,12 @@ await writeJson(path.join(dir,'config/project.json'),project);await writeJson(pa
 const calls=[];let next=0;
 // Two-phase collection: the list pass returns candidates without bodies, the open pass returns the
 // article with its body. A single shape cannot serve both any more.
-const LIST_RECORD={identity:'same',title:'技术机制',url:'https://example.org/article',account:'source',relative_date:'1天前',snippet:'real experiment changed mechanism',list_only:true};
-const OPEN_RECORD={identity:'same',title:'技术机制',url:'https://example.org/article',author:'a',account:'source',date:'2026-10-26',body_text:'real experiment changed mechanism',body_complete:true,body_status:'read',within_window:true};
+const LIST_RECORD={identity:'same',title:'技术机制',url:'https://example.org/article',account:'source',relative_date:'1天前',age_seconds:3600,snippet:'real experiment changed mechanism',list_only:true};
+const OPEN_RECORD={identity:'same',title:'技术机制',url:'https://example.org/article',author:'a',account:'source',date:'2026-10-26',age_seconds:3600,body_text:'real experiment changed mechanism',body_complete:true,body_status:'read',within_window:true};
 const wechat={
   async start(args,opts){calls.push({id:'j'+next,args,opts});next+=1;return {job_id:'j'+(next-1)};},
   async wait(id){return {status:'complete',coverage:{scope_complete:true},stop_reason:'boundary'};},
-  async getResult(id){const call=calls.find(c=>c.id===id);const isList=call?.args?.list_only===true;return {records:isList?[LIST_RECORD]:[OPEN_RECORD]};},
+  async getResult(id){const call=calls.find(c=>c.id===id);const isList=call?.opts?.list_only===true;return {records:isList?[LIST_RECORD]:[OPEN_RECORD]};},
 };
 const llm={async *stream(o){
   const p=JSON.parse(o.messages[0].content[0].text);
