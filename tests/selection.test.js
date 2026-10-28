@@ -44,13 +44,17 @@ test('quality judgement round-trips through the model schema', () => {
   assert.equal(validateQuality({ novelty: 5, specificity: 0, depth: 0, firstHand: 0, honesty: 0 }), null, 'out-of-range dimensions are rejected');
 });
 
-test('a pool smaller than the target keeps every article, even weak ones', () => {
-  // Seats are empty, so a below-floor article is better than a gap. The floor only earns its keep
-  // once there is competition for seats.
-  const r = selectEdition([art(weakQuality)], { target: 30, minScore: 6 });
-  assert.equal(r.stats.selected, 1);
+test('a short pool keeps decent articles but drops bottom-scored ones', () => {
+  // Empty seats are no reason to publish a piece the model scored at the bottom: that is a burden,
+  // not a filler. A mid-range article is still kept, because the pool is short.
+  const weak = art(weakQuality, { id: 'weak', prescreen: { category: 'application', keep: true, point: 'p1' } });
+  const mid = art({ novelty: 1, specificity: 1, depth: 1, firstHand: 0, honesty: 1, total: 4 }, { id: 'mid', prescreen: { category: 'application', keep: true, point: 'p2' } });
+  const good = art(goodQuality, { id: 'good', prescreen: { category: 'application', keep: true, point: 'p3' } });
+  const r = selectEdition([weak, mid, good], { target: 30, minScore: 6 });
   assert.equal(r.stats.shortPool, true);
-  assert.equal(r.stats.belowThreshold, 0);
+  const ids = r.articles.map((a) => a.id).sort();
+  assert.deepEqual(ids, ['good', 'mid'], 'bottom-scored article is dropped, mid-range kept');
+  assert.equal(r.stats.belowThreshold, 1);
 });
 
 test('with more candidates than seats, the floor drops weak articles', () => {
