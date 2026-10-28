@@ -56,7 +56,7 @@ test('tie verdict reorders the edition and keeps full texts in the payload', asy
       const payload = JSON.parse(o.messages[0].content[0].text);
       seen.push(payload);
       // Prefer index 1 (第二篇)
-      yield { type: 'text-delta', text: JSON.stringify({ indexes: [1, 0], reason: '第二篇更具体' }) };
+      yield { type: 'text-delta', text: JSON.stringify({ keep: [1, 0], reason: '第二篇更具体' }) };
       yield { type: 'finish', reason: { kind: 'stop' } };
     },
   };
@@ -75,8 +75,8 @@ test('a failed tie verdict never drops articles', async () => {
   const second = art({ id: 'y', point: '点y' });
   const llm = { async *stream() { throw new Error('model down'); } };
   const rows = toRows([first, second]);
-  const calls = await judgeTies({ llm, selection: { provider: 'mock', model: 'mock' }, groups: findTieGroups(rows) });
-  assert.equal(calls, 0);
+  // A throwing model must not propagate: the run keeps going and both articles stay publishable.
+  await judgeTies({ llm, selection: { provider: 'mock', model: 'mock' }, groups: findTieGroups(rows) });
   const r = selectEdition([first, second], { target: 30, minScore: 6 });
   assert.equal(r.stats.selected, 2, 'both survive when the judge fails');
 });
