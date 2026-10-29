@@ -31,7 +31,7 @@ test('the agent decides a repost and the verdict marks the article', async (t) =
   let seen = null;
   const { ctx } = fakeAgentContext(async (input) => {
     seen = input;
-    return { repeats: { 'today-1': { match: true, of: 'old-1', reason: '同一发布' } } };
+    return { repeats: [{ id: 'today-1', match: true, of: 'old-1', reason: '同一发布' }] };
   });
   const calls = await judgeRepeats({ ctx, cwd: dir, dir, articles: [a], known });
   assert.equal(calls, 1);
@@ -45,7 +45,7 @@ test('the agent decides a repost and the verdict marks the article', async (t) =
 test('the comparison set is written to a file the agent reads', async (t) => {
   const dir = await tmpDir(t);
   const a = article({ id: 'today-2' });
-  const { ctx } = fakeAgentContext(async () => ({ repeats: {} }));
+  const { ctx } = fakeAgentContext(async () => ({ repeats: [] }));
   await judgeRepeats({ ctx, cwd: dir, dir, articles: [a], known });
   const file = JSON.parse(await fs.readFile(path.join(dir, 'repeats-input.json'), 'utf8'));
   assert.equal(file.repeats.length, 1);
@@ -57,7 +57,7 @@ test('the comparison set is written to a file the agent reads', async (t) => {
 test('an article the agent did not list stays publishable', async (t) => {
   const dir = await tmpDir(t);
   const a = article({ id: 'today-3', title: '完全不同的新系统' });
-  const { ctx } = fakeAgentContext(async () => ({ repeats: {} }));
+  const { ctx } = fakeAgentContext(async () => ({ repeats: [] }));
   await judgeRepeats({ ctx, cwd: dir, dir, articles: [a], known });
   assert.notEqual(a.repeated, true);
 });
@@ -79,7 +79,7 @@ test('articles with no prior history need no judgement', async (t) => {
   let called = false;
   const { ctx } = fakeAgentContext(async () => {
     called = true;
-    return { repeats: {} };
+    return { repeats: [] };
   });
   const calls = await judgeRepeats({ ctx, cwd: dir, dir, articles: [a], known: {} });
   assert.equal(called, false, 'no prior pool means no agent call');

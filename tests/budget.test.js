@@ -9,10 +9,10 @@ const wechat={async start(){return {job_id:'j1'};},async wait(){return {status:'
 const llm={async *stream(o){const p=JSON.parse(o.messages[0].content[0].text);const ids=(p.articles??[p]).map(a=>a.article_id);yield {type:'text-delta',text:JSON.stringify({articles:ids.map(id=>({article_id:id,status:'technical',summary_zh:'vLLM 发布新版本调度器，PagedAttention 改进使吞吐提升 2 倍，实测显存降低 31%，源码剖析了 KV Cache 分层管理。局限：仅厂商内部评测，未独立验证。',reason:'实验依据',evidence_quotes:['real experiment'],topics:['AgenticOS']}))})};yield {type:'finish',reason:{kind:'stop'}};}};
 const agentCtx=fakeAgentContext(async(input)=>{
   if(Array.isArray(input?.candidates)){
-    if(input.candidates[0]?.key!==undefined){const v={};for(const c of input.candidates)v[c.key]={keep:true,reason:'ok',category:'application',point:'p'};return {verdicts:v};}
+    if(input.candidates[0]?.key!==undefined){return {verdicts:input.candidates.map((c)=>({key:c.key,keep:true,reason:'ok',category:'application',point:'p'}))};}
     return {keep:input.candidates.map((c)=>c.index),reason:'ok'};
   }
-  if(Array.isArray(input?.repeats))return {repeats:{}};
+  if(Array.isArray(input?.repeats))return {repeats:[]};
   return {};
 }).ctx;
 const pipeline=new DailyPipeline({projectDir:dir,ctx:agentCtx,wechat,fetchText:async()=>'<article>'+('real experiment changed mechanism '+('more '.repeat(50)))+'</article>',llm,selection:()=>({provider:'mock',model:'mock'}),runProcess:async()=>({exitCode:0}),clock:()=>new Date('2026-10-26T04:00:00Z'),...options});await pipeline.ready;t.after(async()=>{await pipeline.dispose();await fs.rm(dir,{recursive:true,force:true});});return {dir,pipeline};}
