@@ -1,5 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import { judgeRepeats } from '../lib/repeat-judge.js';
 
 const article = (over = {}) => ({
@@ -15,44 +18,120 @@ const known = {
   'old-2': { reported_on: [], analysis: { summary_zh: '没推过的不算', topics: ['Agent'] } },
 };
 
-test('the model decides a repost, and the verdict marks the article', async () => {
+async function tmpDir(t) {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'repeat-'));
+  t.after(() => fs.rm(dir, { recursive: true, force: true }));
+  return dir;
+}
+
+test('the model decides a repost, and the verdict marks the article', async (t) => {
+  const dir = await tmpDir(t);
   const a = article();
   const llm = {
     async *stream(o) {
       const payload = JSON.parse(o.messages[0].content[0].text);
-      assert.equal(payload.publishedBefore.length, 1, 'only previously published entries are offered');
-      assert.equal(payload.publishedBefore[0].id, 'old-1');
-      assert(payload.article.body.includes('MemCurrent'), 'the body is supplied, not just the title');
-      yield { type: 'text-delta', text: JSON.stringify({ match: true, of: 'old-1', reason: '同一发布' }) };
-      yield { type: 'finish', reason: { kind: 'stop' } };
+      assert.equal(payload.published.length, 1, 'only previously published entries are offered');
+      assert.equal(payload.published[0].id, 'old-1');
+      assert.ok(payload.repeats[0].summary.length > 0, 'the article summary is supplied');
+      yield { type: 'text-delta', text: JSON.stringify({ repeats: { 'today-1': { match: true, of: 'old-1', reason: '同一发布' } } }) };
     },
   };
-  const calls = await judgeRepeats({ llm, selection: { provider: 'mock', model: 'mock' }, articles: [a], known });
+  const calls = await judgeRepeats({
+    ctx: {},
+    cwd: dir,
+    dir,
+    llm,
+    selection: { provider: 'm', model: 'm' },
+    articles: [a],
+    known,
+  });
   assert.equal(calls, 1);
   assert.equal(a.repeated, true);
   assert.equal(a.repeat_of, 'old-1');
 });
 
-test('a genuine new article is kept', async () => {
-  const a = article({ id: 'today-2', title: '完全不同的新系统' });
-  const llm = { async *stream() { yield { type: 'text-delta', text: JSON.stringify({ match: false, of: '', reason: '不同系统' }) }; } };
-  await judgeRepeats({ llm, selection: { provider: 'mock', model: 'mock' }, articles: [a], known });
-  assert.equal(a.repeated, false);
+test('the comparison set is written to a file for an agent to read', async (t) => {
+  const dir = await tmpDir(t);
+  const a = article({ id: 'today-2' });
+  const llm = {
+    async *stream() {
+      yield { type: 'text-delta', text: JSON.stringify({ repeats: {} }) };
+    },
+  };
+  await judgeRepeats({
+    ctx: {},
+    cwd: dir,
+    dir,
+    llm,
+    selection: { provider: 'm', model: 'm' },
+    articles: [a],
+    known,
+  });
+  const file = JSON.parse(await fs.readFile(path.join(dir, 'repeats-input.json'), 'utf8'));
+  assert.equal(file.repeats.length, 1);
+  assert.equal(file.published.length, 1);
 });
 
-test('a failed verdict leaves the article publishable', async () => {
-  const a = article({ id: 'today-3' });
-  const llm = { async *stream() { throw new Error('model down'); } };
-  const calls = await judgeRepeats({ llm, selection: { provider: 'mock', model: 'mock' }, articles: [a], known });
+test('a genuine new article is kept', async (t) => {
+  const dir = await tmpDir(t);
+  const a = article({ id: 'today-3', title: '完全不同的新系统' });
+  const llm = {
+    async *stream() {
+      yield { type: 'text-delta', text: JSON.stringify({ repeats: {} }) };
+    },
+  };
+  await judgeRepeats({
+    ctx: {},
+    cwd: dir,
+    dir,
+    llm,
+    selection: { provider: 'm', model: 'm' },
+    articles: [a],
+    known,
+  });
+  assert.notEqual(a.repeated, true);
+});
+
+test('a failed verdict leaves the article publishable', async (t) => {
+  const dir = await tmpDir(t);
+  const a = article({ id: 'today-4' });
+  const llm = {
+    async *stream() {
+      throw new Error('model down');
+    },
+  };
+  const calls = await judgeRepeats({
+    ctx: {},
+    cwd: dir,
+    dir,
+    llm,
+    selection: { provider: 'm', model: 'm' },
+    articles: [a],
+    known,
+  });
   assert.equal(calls, 0);
   assert.notEqual(a.repeated, true, 'a judge failure must not mark the article as a repost');
 });
 
-test('articles with no prior history need no judgement', async () => {
-  const a = article({ id: 'today-4', topics: ['没有历史'] });
+test('articles with no prior history need no judgement', async (t) => {
+  const dir = await tmpDir(t);
+  const a = article({ id: 'today-5', topics: ['没有历史'] });
   let called = false;
-  const llm = { async *stream() { called = true; yield { type: 'text-delta', text: '{}' }; } };
-  const calls = await judgeRepeats({ llm, selection: { provider: 'mock', model: 'mock' }, articles: [a], known });
+  const llm = {
+    async *stream() {
+      called = true;
+      yield { type: 'text-delta', text: '{}' };
+    },
+  };
+  const calls = await judgeRepeats({
+    ctx: {},
+    cwd: dir,
+    dir,
+    llm,
+    selection: { provider: 'm', model: 'm' },
+    articles: [a],
+    known: {},
+  });
   assert.equal(called, false, 'no prior pool means no model call');
   assert.equal(calls, 0);
 });
