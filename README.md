@@ -91,6 +91,17 @@ collection → analysis → archive → site → publication → notification，
 `profile: weekly` 复用日报的全部策略，只覆盖时间窗（7 天）与目标篇数（60），归档到
 `reports/weekly-` 前缀目录，标题追加「· 周报」。关键词、初筛策略、分类比例、模型选择与日报共用。
 
+### 异常处理
+
+判断链路上任何一步失败都直接报错，不降级：拿不到子 agent、子 agent 未产出、初筛出错，都会让该查询
+或整轮失败，并在状态里留下可定位的原因。
+
+少数操作不允许中断整轮——清理旧 run、核对残留状态、取采集器句柄、单篇分析失败后保留原文——这些不
+抛出，但**一律写入 `state.tolerated`**，包含时间、位置与脱敏后的原因，上限 200 条。单篇分析失败的
+记录汇总在 `state.analysis_warnings`。这样"没中断"和"没发生"在事后可以区分。
+
+日志内容经过 `safeError` 脱敏：URL 与 `token=`/`secret=` 之类的值会替换掉，不会把凭据写进状态文件。
+
 ### 临时文件保留期
 
 `retention.temp_retention_days`（默认 30）。每轮开始前清理超期的 run 目录与运行时散落文件。
