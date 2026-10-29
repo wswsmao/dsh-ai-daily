@@ -65,8 +65,13 @@ collection → analysis → archive → site → publication → notification，
 `max_output_tokens`、`batch_size`、`batch_chars`、`batch_article_chars`、`prescreen_max_calls`
 这些为"防超限"存在的参数已经移除；单次分析调用所需的内部上限是 `analysis.js` 里的常量。
 
-拿不到子 agent 时（宿主未提供、或用户消息触发的调用超出了可挂载范围），同一提示词降级为一次
-直接模型调用，并在进度文件里记下 `fallback` 与原因。
+**拿不到 agent 一律报错，不降级。** 判断环节的输入规模已经超出单次请求能承载的范围，把数据重新
+塞回 prompt 只会得到被截断的判断结果，比失败更难发现。`*-progress.json` 会留下 `failed` 与原因，
+便于定位是宿主未提供 `subagents`、provider 缺失，还是子 agent 未写出输出文件。跨日重复判断是例外：
+它失败时保持文章可发布，因为未判定的文章不应被当成重复。
+
+初筛失败同样不再"全量放行"：跳过判断直接打开所有候选，会把预算花在没人筛过的文章上，因此该查询
+直接失败并把原因写进 trace。
 
 ### 保留策略（候选池 → 日报）
 

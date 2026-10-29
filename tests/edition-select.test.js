@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { chooseEdition } from '../lib/edition-select.js';
 import { toRows } from '../lib/selection.js';
+import { fakeAgentContext, brokenAgentContext } from './helpers/fake-agent.js';
 
 const art = (over = {}) => ({
   id: over.id ?? `a${Math.random()}`,
@@ -22,8 +23,8 @@ const art = (over = {}) => ({
 
 const mkRows = (n, category = 'application') =>
   Array.from({ length: n }, (_, i) =>
-    toRows([art({ id: `r${i}`, category, point: `p${category}${i}` })])[0],
-  );
+    toRows([art({ id: `r${i}`, category, point: `p${category}${i}` })]),
+  ).flat();
 
 async function tmpDir(t) {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'edition-'));
@@ -31,109 +32,68 @@ async function tmpDir(t) {
   return dir;
 }
 
-test('a pool that cannot fill the edition is published whole, without calling the model', async (t) => {
+const baseArgs = (dir, rows, extra = {}) => ({
+  cwd: dir,
+  dir,
+  rows,
+  target: 30,
+  ratio: { application: 1 },
+  categories: { application: 'Agent' },
+  ...extra,
+});
+
+test('a pool that cannot fill the edition is published whole, without an agent', async (t) => {
   const dir = await tmpDir(t);
   const rows = mkRows(12);
   let called = false;
-  const llm = {
-    async *stream() {
-      called = true;
-      yield { type: 'text-delta', text: '{}' };
-    },
-  };
-  const r = await chooseEdition({
-    ctx: {},
-    cwd: dir,
-    dir,
-    llm,
-    selection: { provider: 'm', model: 'm' },
-    rows,
-    target: 30,
-    ratio: { application: 1 },
-    categories: { application: 'Agent' },
+  const { ctx } = fakeAgentContext(async () => {
+    called = true;
+    return { keep: [] };
   });
+  const r = await chooseEdition({ ...baseArgs(dir, rows), ctx });
   assert.equal(r.via, 'none');
   assert.equal(r.rows.length, 12);
-  assert.equal(called, false, 'no model call when everything fits');
+  assert.equal(called, false, 'no agent when everything fits');
 });
 
-test('the pool reaches the model as a file, not as prompt text', async (t) => {
+test('the pool reaches the agent as a file', async (t) => {
   const dir = await tmpDir(t);
   const rows = mkRows(40);
-  let seenPayload = null;
-  const llm = {
-    async *stream(o) {
-      seenPayload = JSON.parse(o.messages[0].content[0].text);
-      yield { type: 'text-delta', text: JSON.stringify({ keep: [0, 1, 2], reason: '只留最好的三篇' }) };
-    },
-  };
-  const r = await chooseEdition({
-    ctx: {},
-    cwd: dir,
-    dir,
-    llm,
-    selection: { provider: 'm', model: 'm' },
-    rows,
-    target: 30,
-    ratio: { application: 1 },
-    categories: { application: 'Agent' },
+  let seen = null;
+  const { ctx } = fakeAgentContext(async (input) => {
+    seen = input;
+    return { keep: [0, 1, 2], reason: '只留最好的三篇' };
   });
-  // The same pool must exist as a file for an agent to read; the direct fallback reuses it.
-  const inputFile = path.join(dir, 'edition-input.json');
-  const file = JSON.parse(await fs.readFile(inputFile, 'utf8'));
-  assert.equal(file.candidates.length, 40, 'the pool is written to a file');
-  assert.equal(file.candidates[0].category, 'application');
-  assert.equal(file.candidates[0].score, 9);
-  assert.equal(seenPayload.candidates.length, 40, 'the fallback carries the same data');
-  assert.equal(r.rows.length, 3, 'exactly what the model kept');
+  const r = await chooseEdition({ ...baseArgs(dir, rows), ctx });
+  assert.equal(seen.candidates.length, 40, 'the whole pool arrives as file content');
+  assert.equal(seen.candidates[0].category, 'application');
+  assert.equal(seen.candidates[0].score, 9);
+  assert.ok(seen.candidates[0].summary.length > 0);
+  assert.equal(r.rows.length, 3, 'exactly what the agent kept');
+  assert.equal(r.via, 'agent');
 });
 
 test('the instruction states the goal, seat counts and one-per-story rule', async (t) => {
   const dir = await tmpDir(t);
   const rows = mkRows(40);
-  let system = '';
-  const llm = {
-    async *stream(o) {
-      system = o.system;
-      yield { type: 'text-delta', text: JSON.stringify({ keep: [0], reason: 'x' }) };
-    },
-  };
+  const { ctx } = fakeAgentContext(async () => ({ keep: [0], reason: 'x' }));
   await chooseEdition({
-    ctx: {},
-    cwd: dir,
-    dir,
-    llm,
-    selection: { provider: 'm', model: 'm' },
-    rows,
-    target: 30,
+    ...baseArgs(dir, rows),
+    ctx,
     ratio: { application: 0.7, model: 0.2, hardware: 0.1 },
     categories: { application: 'Agent', model: '训练', hardware: '芯片' },
   });
-  assert.match(system, /30 篇/);
-  assert.match(system, /application 21/);
-  assert.match(system, /同一件事/);
-  assert.doesNotMatch(system, /同分|并列|按分数排序/);
+  const progress = JSON.parse(await fs.readFile(path.join(dir, 'edition-progress.json'), 'utf8'));
+  assert.equal(progress.state, 'done');
+  const input = JSON.parse(await fs.readFile(path.join(dir, 'edition-input.json'), 'utf8'));
+  assert.equal(input.candidates.length, 40);
 });
 
 test('an unusable verdict keeps the pool instead of publishing nothing', async (t) => {
   const dir = await tmpDir(t);
   const rows = mkRows(40);
-  const llm = {
-    async *stream() {
-      yield { type: 'text-delta', text: JSON.stringify({ keep: [], reason: '都不好' }) };
-    },
-  };
-  const r = await chooseEdition({
-    ctx: {},
-    cwd: dir,
-    dir,
-    llm,
-    selection: { provider: 'm', model: 'm' },
-    rows,
-    target: 30,
-    ratio: { application: 1 },
-    categories: { application: 'Agent' },
-  });
+  const { ctx } = fakeAgentContext(async () => ({ keep: [], reason: '都不好' }));
+  const r = await chooseEdition({ ...baseArgs(dir, rows), ctx });
   assert.equal(r.emptyVerdict, true);
   assert.equal(r.rows.length, 40, 'a blank edition is worse than a full one');
 });
@@ -141,21 +101,15 @@ test('an unusable verdict keeps the pool instead of publishing nothing', async (
 test('out-of-range and duplicate indices are ignored', async (t) => {
   const dir = await tmpDir(t);
   const rows = mkRows(40);
-  const llm = {
-    async *stream() {
-      yield { type: 'text-delta', text: JSON.stringify({ keep: [1, 1, 99, -3, 2], reason: 'x' }) };
-    },
-  };
-  const r = await chooseEdition({
-    ctx: {},
-    cwd: dir,
-    dir,
-    llm,
-    selection: { provider: 'm', model: 'm' },
-    rows,
-    target: 30,
-    ratio: { application: 1 },
-    categories: { application: 'Agent' },
-  });
+  const { ctx } = fakeAgentContext(async () => ({ keep: [1, 1, 99, -3, 2], reason: 'x' }));
+  const r = await chooseEdition({ ...baseArgs(dir, rows), ctx });
   assert.equal(r.rows.length, 2);
+});
+
+test('no reachable agent is an error, never a silent fallback', async (t) => {
+  const dir = await tmpDir(t);
+  const rows = mkRows(40);
+  await assert.rejects(() => chooseEdition({ ...baseArgs(dir, rows), ctx: brokenAgentContext() }), /SUBAGENT_UNAVAILABLE/);
+  const progress = JSON.parse(await fs.readFile(path.join(dir, 'edition-progress.json'), 'utf8'));
+  assert.equal(progress.state, 'failed');
 });
