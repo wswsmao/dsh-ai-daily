@@ -62,12 +62,15 @@ test('an article the agent did not list stays publishable', async (t) => {
   assert.notEqual(a.repeated, true);
 });
 
-test('a failed comparison must not hide articles', async (t) => {
+test('a failed comparison stops the run instead of guessing', async (t) => {
   const dir = await tmpDir(t);
   const a = article({ id: 'today-4' });
-  const calls = await judgeRepeats({ ctx: brokenAgentContext(), cwd: dir, dir, articles: [a], known });
-  assert.equal(calls, 0);
-  assert.notEqual(a.repeated, true, 'an unjudged article is not a repost');
+  // Whether an article repeats an earlier story decides what ships; an unjudged answer must not pass
+  // as "not a repeat", so the failure propagates.
+  await assert.rejects(
+    () => judgeRepeats({ ctx: brokenAgentContext(), cwd: dir, dir, articles: [a], known }),
+    /REPEAT_JUDGE_FAILED/u,
+  );
 });
 
 test('articles with no prior history need no judgement', async (t) => {

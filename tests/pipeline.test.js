@@ -61,5 +61,13 @@ assert.equal(s.status,'complete');
 const md=await fs.readFile(path.join(s.archive_path,'daily.md'),'utf8');assert(md.includes('vLLM'));assert(!md.includes('real experiment changed mechanism'));});
 test('same scheduled occurrence returns same run without re-execution',async t=>{const f=await fixture(t);const r=await f.pipeline.start({schedule_occurrence:'one'});await f.pipeline.active.done;const again=await f.pipeline.start({schedule_occurrence:'one'});assert.equal(again.run_id,r.run_id);assert.equal(f.calls.length,4);});
 test('collect-only cannot publish or analyze',async t=>{const f=await fixture(t,{llm:{stream(){throw new Error('must not analyze')}}});const r=await f.pipeline.start({mode:'collect-only'});await f.pipeline.active.done;const s=await f.pipeline.status(r.run_id);assert.equal(s.phase,'collected');assert.equal(s.stages.archive,'pending');});
-test('malformed model output retained as uncertain instead of article omission',async t=>{const f=await fixture(t,{llm:{async *stream(){yield {type:'text-delta',text:'invalid'};yield {type:'finish',reason:{kind:'stop'}};}}});const r=await f.pipeline.start();await f.pipeline.active.done;const s=await f.pipeline.status(r.run_id);assert.equal(s.coverage.analysis_pending,1);assert.equal(s.status,'partial');const records=await readJson(path.join(f.dir,'.runtime/runs',r.run_id,'articles.json'));assert.equal(records.length,1);assert.equal(records[0].analysis.status,'uncertain');});
+test('malformed model output fails the run instead of inventing a verdict',async t=>{
+  const f=await fixture(t,{llm:{async *stream(){yield {type:'text-delta',text:'invalid'};yield {type:'finish',reason:{kind:'stop'}};}}});
+  const r=await f.pipeline.start();await f.pipeline.active.done;
+  const s=await f.pipeline.status(r.run_id);
+  // An article whose analysis cannot be validated would enter the pool on guesswork, so the batch
+  // rejects rather than marking it "uncertain" and moving on.
+  assert.ok(['partial','blocked','failed'].includes(s.status),'the run does not report success');
+  assert.match(JSON.stringify(s.errors??[])+String(s.stop_reason??''),/ANALYSIS_BATCH_FAILED|BATCH_RESULT/);
+});
 test('concurrent run requests cannot start duplicate workers',async t=>{const f=await fixture(t);const both=await Promise.allSettled([f.pipeline.start({mode:'collect-only'}),f.pipeline.start({mode:'collect-only'})]);assert.equal(both.filter(r=>r.status==='fulfilled').length,1);await f.pipeline.active?.done;});

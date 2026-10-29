@@ -26,7 +26,7 @@ test('one batch call reviews several articles instead of one call each',async t=
   for(const a of articles)assert.equal(result.get(a.id).status,'technical');
 });
 
-test('a batch entry missing an article is kept as uncertain rather than guessed',async t=>{
+test('a batch reply missing an article fails instead of inventing a verdict',async t=>{
   const cacheDir=await cache(t);
   const llm={async *stream(o){
     const p=JSON.parse(o.messages[0].content[0].text);
@@ -35,10 +35,8 @@ test('a batch entry missing an article is kept as uncertain rather than guessed'
   }};
   const reviewer=new ArticleReviewer({llm,selection:{provider:'m',model:'m'},policy:'p',cacheDir,config:{max_retries:0,max_calls:10,max_output_tokens:4000,batch_size:3},signal:undefined});
   const articles=[{id:'x',title:'a',url:'https://example.org/a',body_text:'real experiment',body_complete:true,body_basis:'正文',topics:[]},{id:'y',title:'b',url:'https://example.org/b',body_text:'real experiment',body_complete:true,body_basis:'正文',topics:[]}];
-  const result=await reviewer.reviewBatch(articles);
-  assert.equal(result.get('x').status,'technical');
-  assert.equal(result.get('y').status,'uncertain','a missing entry must not be invented');
-  assert.equal(result.get('y').processing_error,true);
+  // An unjudged article would enter the pool on guesswork, so the reply is rejected with the title.
+  await assert.rejects(()=>reviewer.reviewBatch(articles),/BATCH_RESULT_INCOMPLETE/u);
 });
 
 test('articles with no body are never sent to the model',async t=>{

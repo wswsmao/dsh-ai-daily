@@ -93,12 +93,28 @@ collection → analysis → archive → site → publication → notification，
 
 ### 异常处理
 
-判断链路上任何一步失败都直接报错，不降级：拿不到子 agent、子 agent 未产出、初筛出错，都会让该查询
-或整轮失败，并在状态里留下可定位的原因。
+凡是影响成篇数量或质量的一步失败，都直接报错并留下可回溯的原因，不降级：
 
-少数操作不允许中断整轮——清理旧 run、核对残留状态、取采集器句柄、单篇分析失败后保留原文——这些不
-抛出，但**一律写入 `state.tolerated`**，包含时间、位置与脱敏后的原因，上限 200 条。单篇分析失败的
-记录汇总在 `state.analysis_warnings`。这样"没中断"和"没发生"在事后可以区分。
+| 失败点 | 错误码 |
+|---|---|
+| 拿不到子 agent | `SUBAGENT_UNAVAILABLE` / `AGENT_OWNER_UNAVAILABLE` |
+| 子 agent 未产出结果 | `AGENT_OUTPUT_MISSING` |
+| 初筛漏判候选 | `PRESCREEN_INCOMPLETE`（列出漏了哪些） |
+| 初筛分类越界 | `MODEL_CATEGORY_INVALID` |
+| 文章没有正文 | `ARTICLE_BODY_MISSING` |
+| 单篇分析失败 | `ARTICLE_ANALYSIS_FAILED` |
+| 批量返回缺条目 | `BATCH_RESULT_INCOMPLETE` |
+| 批量返回不可校验 | `BATCH_RESULT_INVALID` |
+| 跨日重复判断失败 | `REPEAT_JUDGE_FAILED` |
+
+「未判定」不等于「合格」：缺一条初筛结论、少一条批量结果，都按缺陷处理，因为放行等于用猜测填充
+成篇数量与质量。每条错误都带文章标题或索引，便于直接定位到是哪一篇。
+
+少数操作不允许中断整轮——清理旧 run、核对残留状态、取采集器句柄——这些不抛出，但**一律写入
+`state.tolerated`**，含时间、位置与脱敏原因，上限 200 条。这样"没中断"和"没发生"事后可以区分。
+
+运行时预算中止是另一回事：它把分析截断，但已完成的文章仍会归档、发布并计入覆盖说明，状态记为
+`partial` 而非 `complete`。
 
 日志内容经过 `safeError` 脱敏：URL 与 `token=`/`secret=` 之类的值会替换掉，不会把凭据写进状态文件。
 
