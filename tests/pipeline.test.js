@@ -33,7 +33,7 @@ const llm={async *stream(o){
 const agentCtx=()=>{
   const {ctx}=fakeAgentContext(async(input)=>{
     if(Array.isArray(input?.candidates)&&input.candidates[0]?.title!==undefined&&!input.candidates[0]?.summary){
-      return {verdicts:input.candidates.map((c)=>({key:c.key,keep:true,reason:'类型符合',category:'application',point:'信息点 '+c.title}))};
+      return {verdicts:input.candidates.map((c)=>({index:c.index,keep:true,reason:'类型符合',category:'application',point:'信息点 '+c.title}))};
     }
     if(Array.isArray(input?.candidates)){
       return {keep:input.candidates.map((c)=>c.index),reason:'全部保留'};

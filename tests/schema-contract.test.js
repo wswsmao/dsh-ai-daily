@@ -62,7 +62,7 @@ test('a keyed map is expressed as a list, because additionalProperties cannot ca
   // rejects. The list form is the portable one, and the caller builds the map from it.
   assert.equal(PRESCREEN.properties.verdicts.type, 'array');
   assert.equal(REPEAT.properties.repeats.type, 'array');
-  assert.ok(PRESCREEN.properties.verdicts.items.required.includes('key'));
+  assert.ok(PRESCREEN.properties.verdicts.items.required.includes('index'));
   assert.ok(REPEAT.properties.repeats.items.required.includes('id'));
 });
 

@@ -9,7 +9,7 @@ const wechat={async start(){return {job_id:'j1'};},async wait(){return {status:'
 const llm={async *stream(o){const p=JSON.parse(o.messages[0].content[0].text);const ids=(p.articles??[p]).map(a=>a.article_id);yield {type:'text-delta',text:JSON.stringify({articles:ids.map(id=>({article_id:id,status:'technical',summary_zh:'vLLM 发布新版本调度器，PagedAttention 改进使吞吐提升 2 倍，实测显存降低 31%，源码剖析了 KV Cache 分层管理。局限：仅厂商内部评测，未独立验证。',reason:'实验依据',evidence_quotes:['real experiment'],topics:['AgenticOS']}))})};yield {type:'finish',reason:{kind:'stop'}};}};
 const agentCtx=fakeAgentContext(async(input)=>{
   if(Array.isArray(input?.candidates)){
-    if(input.candidates[0]?.key!==undefined){return {verdicts:input.candidates.map((c)=>({key:c.key,keep:true,reason:'ok',category:'application',point:'p'}))};}
+    if(input.candidates[0]?.key!==undefined){return {verdicts:input.candidates.map((c)=>({index:c.index,keep:true,reason:'ok',category:'application',point:'p'}))};}
     return {keep:input.candidates.map((c)=>c.index),reason:'ok'};
   }
   if(Array.isArray(input?.repeats))return {repeats:[]};
