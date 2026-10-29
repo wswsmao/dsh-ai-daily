@@ -57,18 +57,20 @@ collection → analysis → archive → site → publication → notification，
 
 1. 代码把本次输入写成 `<name>-input.json`
 2. 子 agent 用 read 读这个文件，自己决定分几次读、按什么顺序看
-3. 子 agent 用 write 把结论写到 `<name>-output.json`
-4. 代码读输出文件继续下一步，**不解析回复文本**
+3. 子 agent 把结论放进**结构化返回值**，由平台按 `outputSchema` 校验
+4. **代码**把结论写成 `<name>-output.json`，不解析回复文本
 5. 进度写 `<name>-progress.json`，中断后能看出跑到哪一步
+
+第 3、4 步的分工是刻意的：子 agent 只读不写。早先让它自己写结果文件时，一次运行用了本机 shell
+不支持的参数，写入失败后子 agent 正常结束，调用方只看到一个"文件不存在"，既无法判断是没写还是写坏，
+也无法预防下一次。把落盘收回调用方后，写失败只可能是真实文件系统问题。
 
 这样一次判断的规模由 agent 自己的读法决定，不再受单次请求的上下文或输出上限约束。因此
 `max_output_tokens`、`batch_size`、`batch_chars`、`batch_article_chars`、`prescreen_max_calls`
 这些为"防超限"存在的参数已经移除；单次分析调用所需的内部上限是 `analysis.js` 里的常量。
 
-**拿不到 agent 一律报错，不降级。** 判断环节的输入规模已经超出单次请求能承载的范围，把数据重新
-塞回 prompt 只会得到被截断的判断结果，比失败更难发现。`*-progress.json` 会留下 `failed` 与原因，
-便于定位是宿主未提供 `subagents`、provider 缺失，还是子 agent 未写出输出文件。跨日重复判断是例外：
-它失败时保持文章可发布，因为未判定的文章不应被当成重复。
+**拿不到 agent 一律报错，不降级。** `*-progress.json` 会留下 `failed` 与原因，可区分宿主未提供
+`subagents`、provider 缺失、子 agent 提前停止（带 stop reason）、以及子 agent 未返回结构化结果。
 
 初筛失败同样不再"全量放行"：跳过判断直接打开所有候选，会把预算花在没人筛过的文章上，因此该查询
 直接失败并把原因写进 trace。
@@ -98,7 +100,8 @@ collection → analysis → archive → site → publication → notification，
 | 失败点 | 错误码 |
 |---|---|
 | 拿不到子 agent | `SUBAGENT_UNAVAILABLE` / `AGENT_OWNER_UNAVAILABLE` |
-| 子 agent 未产出结果 | `AGENT_OUTPUT_MISSING` |
+| 子 agent 提前停止 | `SUBAGENT_STOPPED:<原因>` |
+| 子 agent 未返回结构化结果 | `SUBAGENT_RESULT_MISSING` |
 | 初筛漏判候选 | `PRESCREEN_INCOMPLETE`（列出漏了哪些） |
 | 初筛分类越界 | `MODEL_CATEGORY_INVALID` |
 | 文章没有正文 | `ARTICLE_BODY_MISSING` |
