@@ -81,7 +81,6 @@ test('archive directory is <date>-<edition> so repeated same-day runs never over
   const r = await f.pipeline.start();
   await f.pipeline.active.done;
   const s = await f.pipeline.status(r.run_id);
-  console.error('[dbg] status=' + s.status + ' stop=' + String(s.stop_reason).slice(0, 90) + ' err=' + JSON.stringify((s.errors || []).slice(0, 1)));
   assert.match(s.archive_path.replace(/\\/gu, '/'), /reports\/2026-10-27-1$/u, `archive path was ${s.archive_path}`);
   const files = await fs.readdir(s.archive_path);
   assert.ok(files.includes('daily.md'));
