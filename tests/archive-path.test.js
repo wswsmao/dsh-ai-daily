@@ -5,6 +5,28 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DailyPipeline } from '../lib/pipeline.js';
 import { reportRelativePath } from '../lib/site.js';
+import { fakeAgentContext } from './helpers/fake-agent.js';
+
+/** The screening stage talks to a sub-agent now, so every pipeline fixture needs a Host stand-in that
+ *  can answer a file job. Without one the run fails at screening and never reaches archiving, which is
+ *  what these tests are about. */
+const screenAll = () =>
+  fakeAgentContext(async (input) => {
+    if (Array.isArray(input?.candidates) && input.candidates[0]?.snippet !== undefined) {
+      return {
+        verdicts: input.candidates.map((c) => ({
+          index: c.index,
+          keep: true,
+          reason: '类型符合',
+          category: 'application',
+          point: `信息点 ${c.title}`,
+        })),
+      };
+    }
+    if (Array.isArray(input?.candidates)) return { keep: input.candidates.map((c) => c.index), reason: '全部保留' };
+    if (Array.isArray(input?.repeats)) return { repeats: [] };
+    return {};
+  }).ctx;
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 
@@ -48,7 +70,7 @@ async function fixture(t, options = {}) {
       yield { type: 'finish', reason: { kind: 'stop' } };
     },
   };
-  const pipeline = new DailyPipeline({ projectDir: dir, wechat, fetchText: async () => '<article>real experiment body</article>', llm, selection: () => ({ provider: 'mock', model: 'mock' }), runProcess: async () => ({ exitCode: 0 }), clock: () => new Date('2026-10-27T04:00:00Z'), ...options });
+  const pipeline = new DailyPipeline({ projectDir: dir, ctx: options?.ctx ?? screenAll(), wechat, fetchText: async () => '<article>real experiment body</article>', llm, selection: () => ({ provider: 'mock', model: 'mock' }), runProcess: async () => ({ exitCode: 0 }), clock: () => new Date('2026-10-27T04:00:00Z'), ...options });
   await pipeline.ready;
   t.after(async () => { await pipeline.dispose(); await fs.rm(dir, { recursive: true, force: true }); });
   return { dir, pipeline };
@@ -59,6 +81,7 @@ test('archive directory is <date>-<edition> so repeated same-day runs never over
   const r = await f.pipeline.start();
   await f.pipeline.active.done;
   const s = await f.pipeline.status(r.run_id);
+  console.error('[dbg] status=' + s.status + ' stop=' + String(s.stop_reason).slice(0, 90) + ' err=' + JSON.stringify((s.errors || []).slice(0, 1)));
   assert.match(s.archive_path.replace(/\\/gu, '/'), /reports\/2026-10-27-1$/u, `archive path was ${s.archive_path}`);
   const files = await fs.readdir(s.archive_path);
   assert.ok(files.includes('daily.md'));

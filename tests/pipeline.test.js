@@ -32,7 +32,10 @@ const llm={async *stream(o){
 // that can answer a file job. `screenAll` keeps the current fixture contract: every candidate passes.
 const agentCtx=()=>{
   const {ctx}=fakeAgentContext(async(input)=>{
-    if(Array.isArray(input?.candidates)&&input.candidates[0]?.title!==undefined&&!input.candidates[0]?.summary){
+    // Screening carries `snippet`; edition selection carries the read-through `summary`. Distinguish on
+    // that rather than on the absence of a field, so a change to either payload cannot silently route
+    // the answer to the wrong stage.
+    if(Array.isArray(input?.candidates)&&input.candidates[0]?.snippet!==undefined){
       return {verdicts:input.candidates.map((c)=>({index:c.index,keep:true,reason:'类型符合',category:'application',point:'信息点 '+c.title}))};
     }
     if(Array.isArray(input?.candidates)){
