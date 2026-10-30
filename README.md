@@ -93,6 +93,30 @@ collection → analysis → archive → site → publication → notification，
 `profile: weekly` 复用日报的全部策略，只覆盖时间窗（7 天）与目标篇数（60），归档到
 `reports/weekly-` 前缀目录，标题追加「· 周报」。关键词、初筛策略、分类比例、模型选择与日报共用。
 
+### 读者反馈（点踩）
+
+网页每张卡片有一个「这篇不该出现」按钮。提交时必须写理由，服务端不接收没有理由的踩。
+
+```
+网页 POST /api/feedback  {verdict:'bad', reason, articleId, title, account, category, score, date, version}
+      ↓ 追加到 .runtime/feedback.jsonl（只追加，不进 site 目录）
+下次生成日报时读取，按公众号与分类聚合成次数与具体理由
+      ↓ 作为 reader_votes_on_account 附在每个候选上
+选稿 agent 自己判断这些事实意味着什么
+```
+
+设计上有两处刻意的取舍：
+
+- **点踩不重新生成当天日报。** 重新选稿、渲染并推送会让已发出的链接失效，因此反馈只影响后续。
+- **只给事实，不给权重。** 没有踩率计算、没有阈值、没有自动排除。一个被踩过几次的公众号可能只是
+  偶尔跑偏，也可能长期选题不对，把这件事交给读完全文的模型判断，比用计数做规则更可靠。同理，
+  `state.reader_feedback` 只记录次数与理由，不含任何推导出的结论。
+
+`feedback.jsonl` 读不出一行会直接失败（`FEEDBACK_LINE_INVALID`）：跳过坏行会让复盘基于残缺画面，
+比停下来更糟。文件不存在视为还没有人投票。
+
+历史页面不会自动长出新按钮，只有在改动后重新渲染的那一期才带反馈控件。
+
 ### 异常处理
 
 凡是影响成篇数量或质量的一步失败，都直接报错并留下可回溯的原因，不降级：
