@@ -62,8 +62,14 @@ test('a keyed map is expressed as a list, because additionalProperties cannot ca
   // rejects. The list form is the portable one, and the caller builds the map from it.
   assert.equal(PRESCREEN.properties.verdicts.type, 'array');
   assert.equal(REPEAT.properties.repeats.type, 'array');
+  // Every judgement stage addresses rows by integer position. A long string id has to be re-typed by
+  // the child, and one run produced a fabricated one, so no answer shape carries an id.
   assert.ok(PRESCREEN.properties.verdicts.items.required.includes('index'));
-  assert.ok(REPEAT.properties.repeats.items.required.includes('id'));
+  assert.equal(PRESCREEN.properties.verdicts.items.properties.index.type, 'integer');
+  assert.ok(REPEAT.properties.repeats.items.required.includes('index'));
+  assert.equal(REPEAT.properties.repeats.items.properties.index.type, 'integer');
+  assert.equal(REPEAT.properties.repeats.items.properties.of.type, 'integer');
+  assert.equal(EDITION.properties.keep.items.type, 'integer');
 });
 
 test('every schema requires its answer field so an empty reply is rejected', () => {
